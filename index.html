@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truman Chipotle — The Chipotle Diaries</title>
+    <meta name="description" content="A Lynchian journal of the unseen and the half-eaten. Enter the Red Room.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Special+Elite&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Ambient Dust Particles -->
+    <div id="particles-container"></div>
+
+    <!-- Red Room Backdrop overlays -->
+    <div class="red-room-overlay"></div>
+    <div class="chevron-floor"></div>
+
+    <!-- Hanging flickering light bulb -->
+    <div class="hanging-lamp" id="lamp">
+        <div class="wire"></div>
+        <div class="bulb-socket"></div>
+        <div class="bulb" id="bulb">
+            <div class="glow"></div>
+        </div>
+    </div>
+
+    <!-- Main Workspace Container -->
+    <div class="desk">
+        <!-- Vintage Desk Lamp Glow -->
+        <div class="lamp-glow"></div>
+
+        <div class="desk-content">
+            <header class="main-header">
+                <h1 class="logo">Truman Chipotle</h1>
+                <p class="tagline">An Inquiry into the Half-Eaten</p>
+            </header>
+
+            <!-- Book System -->
+            <div class="book-perspective">
+                <div class="book" id="book">
+                    <!-- Book Cover (Front) -->
+                    <div class="book-cover front" id="book-cover">
+                        <div class="cover-design">
+                            <div class="border-gold"></div>
+                            <div class="cover-title">
+                                <span class="title-sub">The</span>
+                                <h2 class="title-main">Chipotle</h2>
+                                <h2 class="title-main">Diaries</h2>
+                                <span class="title-sub">Truman Chipotle</span>
+                            </div>
+                            <div class="cover-emboss">
+                                <div class="gold-rose-icon">🌹</div>
+                            </div>
+                            <button class="open-btn" id="open-btn">
+                                <span>Open Journal</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Book Pages Container (Internal) -->
+                    <div class="book-pages">
+                        <!-- Left Page: The Diary -->
+                        <div class="page left-page">
+                            <div class="page-texture"></div>
+                            <div class="page-content">
+                                <div class="page-header">
+                                    <span class="page-number">I</span>
+                                </div>
+                                <div class="diary-container">
+                                    <div class="diary-entry active" id="entry-1">
+                                        <div class="entry-date">October 12, 1989</div>
+                                        <p class="entry-text">The foil was wrapped in a way that suggested another dimension. When I peeled it back, I did not find beans or rice. I found a small key, cold to the touch, and the scent of Douglas firs. The grill master looked at me, but his eyes were like television static.</p>
+                                    </div>
+                                    <div class="diary-entry" id="entry-2">
+                                        <div class="entry-date">November 3, 1989</div>
+                                        <p class="entry-text">He is sitting in the corner booth. He looks exactly like me, but he is wearing a dark suit. He ordered a burrito bowl, double steak. He has been eating it for three days. The bowl is never empty. Sometimes he whispers: <em>"The owls are not what they seem, but the guacamole is extra."</em></p>
+                                    </div>
+                                    <div class="diary-entry" id="entry-3">
+                                        <div class="entry-date">December 15, 1989</div>
+                                        <p class="entry-text">The red curtains in the back of the kitchen are not on the blueprint. The manager claims they have always been there, but the salsa bar is whispering in reverse. I asked for the medium salsa, and the clerk replied in a voice that sounded like a record played backwards: <em>"Yrt eht reppep."</em></p>
+                                    </div>
+                                    <div class="diary-entry" id="entry-4">
+                                        <div class="entry-date">January 20, 1990</div>
+                                        <p class="entry-text">A blue rose. It grew from a discarded napkin. If you listen closely, it plays a song from a radio station that went off the air in 1957. The sound is beautiful, but it makes me forget my own name. We are like the dreamer who dreams, and then lives inside the dream. Who is the dreamer?</p>
+                                    </div>
+                                </div>
+                                <div class="page-controls">
+                                    <button class="nav-btn prev-btn" id="prev-btn" disabled>&larr; Prior</button>
+                                    <span class="entry-indicator" id="entry-indicator">1 / 4</span>
+                                    <button class="nav-btn next-btn" id="next-btn">Next &rarr;</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Page: Interactive Artifacts -->
+                        <div class="page right-page">
+                            <div class="page-texture"></div>
+                            <div class="page-content">
+                                <div class="page-header">
+                                    <span class="page-number">II</span>
+                                </div>
+                                
+                                <!-- Embedded Lynchian Blue Rose -->
+                                <div class="rose-frame-container">
+                                    <div class="vintage-frame">
+                                        <img src="assets/blue_rose.jpg" alt="The Blue Rose" class="blue-rose-img" id="blue-rose">
+                                        <div class="shadow-overlay"></div>
+                                    </div>
+                                    <div class="rose-caption">"Look for the Blue Rose"</div>
+                                </div>
+
+                                <!-- Audio Console (Retro Dial & Switch) -->
+                                <div class="audio-console">
+                                    <div class="console-title">Ethereal Frequencies</div>
+                                    <div class="console-controls">
+                                        <div class="knob-container">
+                                            <div class="vintage-knob" id="freq-knob">
+                                                <div class="knob-indicator"></div>
+                                            </div>
+                                            <div class="knob-label">Tuning: <span id="freq-val">508 Hz</span></div>
+                                        </div>
+                                        <div class="switch-container">
+                                            <label class="switch">
+                                                <input type="checkbox" id="red-room-toggle">
+                                                <span class="slider"></span>
+                                            </label>
+                                            <div class="switch-label">Red Room Mode</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Volume Slider & Tube Light -->
+                                    <div class="console-footer">
+                                        <div class="volume-slider-container">
+                                            <span class="volume-icon">🔊</span>
+                                            <input type="range" min="0" max="100" value="30" class="volume-slider" id="volume-slider">
+                                        </div>
+                                        <div class="vacuum-tube" id="vacuum-tube">
+                                            <div class="filament"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Write to the Void -->
+                                <div class="void-writer-container">
+                                    <label for="void-input" class="void-label">Feed the Void (Type a secret):</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="void-input" maxlength="80" placeholder="Type a message to burn..." autocomplete="off">
+                                        <button id="burn-btn">Feed</button>
+                                    </div>
+                                    <div class="void-output" id="void-output"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer / Navigation -->
+            <footer class="main-footer">
+                <button class="sound-toggle-fallback" id="sound-toggle-fallback">🔊 Enable Audio Ambient</button>
+                <p class="copyright">&copy; 1989–2026 Truman Chipotle Records. All things are hollow.</p>
+            </footer>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

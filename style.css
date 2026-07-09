@@ -1,0 +1,1193 @@
+/* --- Design System & Reset --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #0b0705;
+    color: #e3d2be;
+    font-family: 'EB Garamond', serif;
+    overflow-x: hidden;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1500px;
+}
+
+/* --- Custom Scrollbar --- */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #110c0a;
+}
+::-webkit-scrollbar-thumb {
+    background: #3c2920;
+    border-radius: 3px;
+}
+
+/* --- Background Aesthetics --- */
+/* Ambient Dust Particles */
+#particles-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.4;
+}
+
+.particle {
+    position: absolute;
+    background: rgba(227, 210, 190, 0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: floatUp 15s linear infinite;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(100vh) translateX(0) scale(0.5);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-10vh) translateX(100px) scale(1.2);
+        opacity: 0;
+    }
+}
+
+/* Wood Desk / Velvet Backdrop */
+.desk {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle at 50% 30%, #22140e 0%, #0d0705 70%);
+    z-index: 2;
+    transition: background 2s ease;
+    overflow: hidden;
+}
+
+/* Vintage desk lamp glow overlay */
+.lamp-glow {
+    position: absolute;
+    top: -10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0) 70%);
+    pointer-events: none;
+    z-index: 3;
+    mix-blend-mode: color-dodge;
+    transition: background 2s ease, opacity 2s ease;
+}
+
+.desk-content {
+    position: relative;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 90vh;
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+}
+
+/* --- Header & Typography --- */
+.main-header {
+    text-align: center;
+    margin-bottom: 20px;
+    transition: opacity 1s ease;
+}
+
+.logo {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 2.8rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: #d4af37;
+    text-shadow: 
+        0 1px 0 #997d1b, 
+        0 2px 0 #886c13, 
+        0 3px 0 #775b0c, 
+        0 8px 10px rgba(0, 0, 0, 0.7);
+    text-transform: uppercase;
+    animation: goldGlow 6s ease-in-out infinite alternate;
+}
+
+.tagline {
+    font-style: italic;
+    font-size: 1.1rem;
+    color: #8c7365;
+    letter-spacing: 2px;
+    margin-top: 5px;
+    text-transform: uppercase;
+}
+
+@keyframes goldGlow {
+    0% {
+        text-shadow: 0 1px 0 #997d1b, 0 2px 0 #886c13, 0 3px 0 #775b0c, 0 8px 10px rgba(0, 0, 0, 0.7);
+    }
+    100% {
+        text-shadow: 
+            0 1px 0 #997d1b, 
+            0 2px 0 #886c13, 
+            0 3px 0 #775b0c, 
+            0 8px 10px rgba(0, 0, 0, 0.7),
+            0 0 20px rgba(212, 175, 55, 0.2);
+    }
+}
+
+/* --- Hanging Lamp (Lynchian) --- */
+.hanging-lamp {
+    position: absolute;
+    top: 0;
+    left: 15%;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform-origin: top center;
+    animation: gentleSway 8s ease-in-out infinite alternate;
+    pointer-events: none;
+    opacity: 0; /* Hidden in normal mode, visible in Red Room */
+    transition: opacity 2s ease;
+}
+
+.wire {
+    width: 2px;
+    height: 180px;
+    background: #111;
+    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+.bulb-socket {
+    width: 16px;
+    height: 25px;
+    background: #333;
+    border-radius: 2px;
+    border-bottom: 3px solid #222;
+}
+
+.bulb {
+    position: relative;
+    width: 30px;
+    height: 45px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50% 50% 45% 45%;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.glow {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    background: radial-gradient(circle, #ff2a2a 0%, rgba(255,0,0,0) 80%);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.1s ease;
+}
+
+/* Light flicker animation */
+@keyframes flicker {
+    0%, 18%, 22%, 25%, 53%, 57%, 100% {
+        opacity: 0.9;
+        box-shadow: 0 0 20px #f00, 0 0 40px #f00, 0 0 80px #f00;
+    }
+    20%, 24%, 55%, 56% {
+        opacity: 0.2;
+        box-shadow: 0 0 5px #f00;
+    }
+}
+
+@keyframes gentleSway {
+    0% { transform: rotate(-2deg); }
+    100% { transform: rotate(2deg); }
+}
+
+/* --- Red Room Backdrop Elements --- */
+.red-room-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    background: linear-gradient(90deg, 
+        #200000 0%, #0d0000 8%, #360000 15%, #4a0000 22%, #1a0000 30%, 
+        #050000 38%, #3d0000 45%, #590000 52%, #260000 60%, #0d0000 68%, 
+        #360000 75%, #4a0000 82%, #1a0000 90%, #050000 100%
+    );
+    background-size: 180px 100%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 2s ease;
+}
+
+.chevron-floor {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 25vh;
+    z-index: 1;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="30" viewBox="0 0 60 30"><polygon points="0,0 30,15 60,0 60,15 30,30 0,15" fill="%23111111"/></svg>');
+    background-color: #d1d1d1;
+    background-size: 60px 30px;
+    background-repeat: repeat;
+    transform: perspective(300px) rotateX(55deg);
+    transform-origin: bottom center;
+    box-shadow: inset 0 20px 40px rgba(0,0,0,0.8);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 2s ease;
+}
+
+/* --- Interactive 3D Book Layout --- */
+.book-perspective {
+    width: 780px;
+    height: 520px;
+    position: relative;
+    z-index: 5;
+    margin: auto 0;
+}
+
+.book {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 1.2s cubic-bezier(0.1, 0.8, 0.2, 1);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+    border-radius: 8px;
+}
+
+/* Book Cover (Front) */
+.book-cover.front {
+    position: absolute;
+    width: 390px;
+    height: 100%;
+    right: 0;
+    top: 0;
+    background: #2b1d0c radial-gradient(circle at 30% 30%, #3d2912 0%, #1f1408 80%);
+    border-radius: 0 8px 8px 0;
+    z-index: 10;
+    transform-origin: left center;
+    transition: transform 1.4s cubic-bezier(0.15, 0.85, 0.45, 1), opacity 0.5s ease;
+    box-shadow: inset -5px 0 10px rgba(0,0,0,0.5), 5px 0 15px rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+/* Embossed gold frame & content on front cover */
+.cover-design {
+    width: 85%;
+    height: 88%;
+    border: 3px double #d4af37;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 40px 20px;
+    position: relative;
+}
+
+.border-gold {
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    pointer-events: none;
+}
+
+.cover-title {
+    text-align: center;
+}
+
+.title-sub {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.9rem;
+    color: #a3852c;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+.title-main {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 2.2rem;
+    color: #e6c667;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+    margin: 5px 0;
+}
+
+.cover-emboss {
+    margin: 20px 0;
+}
+
+.gold-rose-icon {
+    font-size: 3.5rem;
+    filter: sepia(0.5) saturate(1.5) hue-rotate(320deg) drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+    animation: slowPulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes slowPulse {
+    0% { transform: scale(1); filter: sepia(0.5) saturate(1.5) hue-rotate(320deg) drop-shadow(0 2px 4px rgba(0,0,0,0.8)) brightness(1); }
+    100% { transform: scale(1.05); filter: sepia(0.5) saturate(1.5) hue-rotate(320deg) drop-shadow(0 4px 8px rgba(212, 175, 55, 0.4)) brightness(1.2); }
+}
+
+.open-btn {
+    background: transparent;
+    border: 1px solid #d4af37;
+    color: #d4af37;
+    padding: 10px 24px;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    cursor: pointer;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    z-index: 12;
+}
+
+.open-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(212, 175, 55, 0.1);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    transition: width 0.6s ease, height 0.6s ease;
+}
+
+.open-btn:hover {
+    color: #ffffff;
+    border-color: #ffffff;
+    box-shadow: 0 0 10px rgba(255,255,255,0.2);
+}
+
+.open-btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Book pages wrapper */
+.book-pages {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    background-color: #22140a;
+    border-radius: 6px;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease 0.3s;
+}
+
+/* Book opened state */
+.book.open {
+    /* Slightly slide book to center since it is double page now */
+}
+
+.book.open .book-cover.front {
+    transform: rotateY(-180deg);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.book.open .book-pages {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Individual Page Styling */
+.page {
+    width: 50%;
+    height: 100%;
+    position: relative;
+    background-color: #e5d7bd;
+    color: #2c241a;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.1);
+    transition: filter 2s ease;
+}
+
+/* Vintage Paper Texture Overlay */
+.page-texture {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('assets/old_paper.jpg');
+    background-size: cover;
+    background-position: center;
+    mix-blend-mode: multiply;
+    opacity: 0.95;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.page-content {
+    position: relative;
+    z-index: 2;
+    padding: 35px 30px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.left-page {
+    border-right: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: inset -15px 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.left-page::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 100%;
+    background: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 100%);
+    pointer-events: none;
+    z-index: 3;
+}
+
+.right-page {
+    border-left: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: inset 15px 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.right-page::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 100%;
+    background: linear-gradient(to left, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 100%);
+    pointer-events: none;
+    z-index: 3;
+}
+
+.page-header {
+    border-bottom: 1px solid rgba(44, 36, 26, 0.15);
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+
+.page-number {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: rgba(44, 36, 26, 0.6);
+}
+
+/* --- Left Page Components: Diary Entries --- */
+.diary-container {
+    flex-grow: 1;
+    position: relative;
+    margin-bottom: 15px;
+    height: 320px;
+}
+
+.diary-entry {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+}
+
+.diary-entry.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.entry-date {
+    font-family: 'Cinzel Decorative', serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    color: #4a3625;
+    border-bottom: 1px dashed rgba(44,36,26,0.1);
+    padding-bottom: 4px;
+}
+
+.entry-text {
+    font-family: 'Special Elite', monospace;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #1e1711;
+    text-align: justify;
+    word-spacing: -1px;
+    letter-spacing: 0.5px;
+}
+
+.entry-text em {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    font-weight: bold;
+    color: #631414;
+    letter-spacing: 0;
+}
+
+.page-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(44, 36, 26, 0.15);
+    padding-top: 10px;
+    margin-top: 10px;
+}
+
+.nav-btn {
+    background: transparent;
+    border: none;
+    font-family: 'Cinzel Decorative', serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: #4a3625;
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.nav-btn:hover:not(:disabled) {
+    color: #8a1d1d;
+    transform: translateX(-2px);
+}
+
+.next-btn:hover:not(:disabled) {
+    transform: translateX(2px);
+}
+
+.nav-btn:disabled {
+    color: rgba(44, 36, 26, 0.3);
+    cursor: not-allowed;
+}
+
+.entry-indicator {
+    font-size: 0.85rem;
+    color: rgba(44, 36, 26, 0.6);
+}
+
+/* --- Right Page Components --- */
+/* Vintage Oval Rose Frame */
+.rose-frame-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.vintage-frame {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 6px double #3e2f1e;
+    box-shadow: 
+        0 4px 8px rgba(0,0,0,0.3),
+        inset 0 2px 4px rgba(0,0,0,0.4);
+    overflow: hidden;
+    position: relative;
+    background: #000;
+    cursor: pointer;
+    transition: transform 0.5s ease, border-color 0.5s ease;
+}
+
+.vintage-frame:hover {
+    transform: scale(1.04);
+}
+
+.blue-rose-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.85) contrast(1.1);
+    transition: filter 1s ease;
+}
+
+.shadow-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+    pointer-events: none;
+}
+
+.rose-caption {
+    font-style: italic;
+    font-size: 0.8rem;
+    color: rgba(44, 36, 26, 0.7);
+    margin-top: 5px;
+    letter-spacing: 1px;
+}
+
+/* Ethereal Audio Console */
+.audio-console {
+    background: rgba(44, 36, 26, 0.05);
+    border: 1px solid rgba(44, 36, 26, 0.15);
+    border-radius: 4px;
+    padding: 12px;
+    margin-bottom: 15px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.console-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #4a3625;
+    text-align: center;
+    border-bottom: 1px dashed rgba(44,36,26,0.15);
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.console-controls {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.knob-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.vintage-knob {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #555, #222);
+    border: 2px solid #111;
+    position: relative;
+    cursor: grab;
+    transition: transform 0.1s ease;
+    box-shadow: 0 3px 5px rgba(0,0,0,0.3);
+}
+
+.vintage-knob:active {
+    cursor: grabbing;
+}
+
+.knob-indicator {
+    position: absolute;
+    width: 3px;
+    height: 12px;
+    background: #d4af37;
+    top: 3px;
+    left: calc(50% - 1.5px);
+    transform-origin: bottom center;
+}
+
+.knob-label {
+    font-size: 0.75rem;
+    color: #4a3625;
+    margin-top: 5px;
+    font-weight: 700;
+}
+
+/* Custom Styled Toggle Switch */
+.switch-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #5a4b3d;
+    transition: .4s;
+    border-radius: 24px;
+    border: 1px solid #111;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #d4af37;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+input:checked + .slider {
+    background-color: #801515;
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+    background-color: #ff3333;
+    box-shadow: 0 0 8px #ff3333;
+}
+
+.switch-label {
+    font-size: 0.72rem;
+    color: #4a3625;
+    margin-top: 5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.console-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    padding-top: 5px;
+    border-top: 1px solid rgba(44,36,26,0.08);
+}
+
+.volume-slider-container {
+    display: flex;
+    align-items: center;
+    width: 70%;
+}
+
+.volume-icon {
+    font-size: 0.8rem;
+    margin-right: 5px;
+    opacity: 0.7;
+}
+
+.volume-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: #5a4b3d;
+    outline: none;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #4a3625;
+    cursor: pointer;
+    border: 1px solid #111;
+    transition: background 0.3s;
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+    background: #8a1d1d;
+}
+
+/* Vacuum Tube Graphic */
+.vacuum-tube {
+    width: 22px;
+    height: 38px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(0,0,0,0.3);
+    border-radius: 10px 10px 2px 2px;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: center;
+}
+
+.filament {
+    position: absolute;
+    bottom: 4px;
+    width: 2px;
+    height: 18px;
+    background: #444;
+    transition: background 1.5s ease, box-shadow 1.5s ease;
+    border-radius: 1px;
+}
+
+/* When sound is enabled */
+.filament.active {
+    background: #ff5500;
+    box-shadow: 0 0 8px #ff5500, 0 0 15px #ff2200;
+}
+
+/* Write to the Void */
+.void-writer-container {
+    margin-top: 5px;
+}
+
+.void-label {
+    display: block;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #4a3625;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.input-wrapper {
+    display: flex;
+    gap: 5px;
+}
+
+#void-input {
+    flex-grow: 1;
+    background: rgba(44, 36, 26, 0.08);
+    border: 1px solid rgba(44, 36, 26, 0.25);
+    border-radius: 3px;
+    padding: 6px 10px;
+    font-family: 'Special Elite', monospace;
+    font-size: 0.8rem;
+    color: #1e1711;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+#void-input:focus {
+    border-color: #8a1d1d;
+}
+
+#burn-btn {
+    background: #4a3625;
+    color: #e5d7bd;
+    border: 1px solid #2c241a;
+    border-radius: 3px;
+    padding: 6px 12px;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#burn-btn:hover {
+    background: #8a1d1d;
+    border-color: #631414;
+    color: #fff;
+    box-shadow: 0 0 5px rgba(138, 29, 29, 0.4);
+}
+
+.void-output {
+    min-height: 24px;
+    margin-top: 8px;
+    font-family: 'Special Elite', monospace;
+    font-size: 0.78rem;
+    color: #631414;
+    font-style: italic;
+    letter-spacing: 0.5px;
+}
+
+.void-output span.burn-char {
+    display: inline-block;
+    animation: ashBurn 1.2s forwards;
+}
+
+@keyframes ashBurn {
+    0% {
+        opacity: 1;
+        transform: translateY(0) rotate(0deg) scale(1);
+        color: #ff3300;
+        filter: blur(0);
+    }
+    40% {
+        color: #ff9900;
+        text-shadow: 0 0 8px #ff3300;
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-20px) rotate(15deg) scale(1.5);
+        color: #555;
+        filter: blur(4px);
+    }
+}
+
+/* --- Footer Area --- */
+.main-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.sound-toggle-fallback {
+    background: rgba(212, 175, 55, 0.08);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: #d4af37;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+}
+
+.sound-toggle-fallback:hover {
+    background: rgba(212, 175, 55, 0.2);
+    border-color: #d4af37;
+    color: #fff;
+}
+
+.copyright {
+    font-size: 0.75rem;
+    color: #523f35;
+    letter-spacing: 1px;
+}
+
+/* --- RED ROOM MODE DYNAMIC SWITCH --- */
+body.red-room-mode .red-room-overlay {
+    opacity: 1;
+}
+
+body.red-room-mode .chevron-floor {
+    opacity: 1;
+}
+
+body.red-room-mode .desk {
+    background: radial-gradient(circle at 50% 30%, #500000 0%, #0d0000 80%);
+}
+
+body.red-room-mode .lamp-glow {
+    background: radial-gradient(circle, rgba(255, 0, 0, 0.25) 0%, rgba(255, 0, 0, 0) 70%);
+}
+
+body.red-room-mode .hanging-lamp {
+    opacity: 1;
+}
+
+body.red-room-mode .bulb .glow {
+    opacity: 1;
+    animation: flicker 4s infinite;
+}
+
+body.red-room-mode .logo {
+    color: #e62121;
+    text-shadow: 
+        0 1px 0 #991b1b, 
+        0 2px 0 #881313, 
+        0 3px 0 #770c0c, 
+        0 8px 10px rgba(0, 0, 0, 0.9),
+        0 0 15px rgba(255, 33, 33, 0.4);
+    animation: goldGlowRed 6s ease-in-out infinite alternate;
+}
+
+@keyframes goldGlowRed {
+    0% {
+        text-shadow: 0 1px 0 #991b1b, 0 2px 0 #881313, 0 3px 0 #770c0c, 0 8px 10px rgba(0, 0, 0, 0.9);
+    }
+    100% {
+        text-shadow: 
+            0 1px 0 #991b1b, 
+            0 2px 0 #881313, 
+            0 3px 0 #770c0c, 
+            0 8px 10px rgba(0, 0, 0, 0.9),
+            0 0 25px rgba(255, 33, 33, 0.6);
+    }
+}
+
+body.red-room-mode .tagline {
+    color: #a33c3c;
+}
+
+body.red-room-mode .book {
+    box-shadow: 0 30px 80px rgba(255, 0, 0, 0.15), 0 30px 60px rgba(0,0,0,0.9);
+}
+
+body.red-room-mode .page {
+    filter: sepia(0.3) hue-rotate(320deg) saturate(1.7) contrast(1.1);
+}
+
+body.red-room-mode .vintage-frame {
+    border-color: #8c1c1c;
+    box-shadow: 0 4px 15px rgba(255,0,0,0.2), inset 0 2px 4px rgba(0,0,0,0.6);
+}
+
+body.red-room-mode .blue-rose-img {
+    filter: brightness(0.65) contrast(1.3) hue-rotate(20deg);
+}
+
+body.red-room-mode .entry-text em {
+    color: #ff2a2a;
+    text-shadow: 0 0 8px rgba(255, 42, 42, 0.4);
+}
+
+body.red-room-mode .nav-btn {
+    color: #722020;
+}
+
+body.red-room-mode .nav-btn:hover:not(:disabled) {
+    color: #ff3333;
+    text-shadow: 0 0 5px rgba(255,51,51,0.5);
+}
+
+body.red-room-mode .copyright {
+    color: #7a3131;
+}
+
+/* Hidden secret element animation in red room */
+body.red-room-mode .diary-entry.active p::after {
+    content: " (Y R U H E R E ?)";
+    font-size: 0.75rem;
+    color: #ff3333;
+    letter-spacing: 2px;
+    animation: pulseRed 2s infinite alternate;
+}
+
+@keyframes pulseRed {
+    0% { opacity: 0.3; }
+    100% { opacity: 1; text-shadow: 0 0 8px rgba(255,51,51,0.8); }
+}
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 820px) {
+    .book-perspective {
+        width: 95vw;
+        height: 65vh;
+        max-width: 400px;
+    }
+    
+    .book {
+        box-shadow: 0 15px 30px rgba(0,0,0,0.8);
+    }
+    
+    .book-cover.front {
+        width: 100%;
+        border-radius: 8px;
+    }
+    
+    .book-pages {
+        flex-direction: column;
+    }
+    
+    .page {
+        width: 100%;
+        height: 50%;
+    }
+    
+    .left-page {
+        border-right: none;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+        box-shadow: inset 0 -10px 15px rgba(0,0,0,0.1);
+    }
+    
+    .right-page {
+        border-left: none;
+        border-top: 1px solid rgba(0, 0, 0, 0.2);
+        box-shadow: inset 0 10px 15px rgba(0,0,0,0.1);
+    }
+    
+    .left-page::after, .right-page::after {
+        display: none;
+    }
+    
+    .logo {
+        font-size: 2rem;
+    }
+    
+    .tagline {
+        font-size: 0.9rem;
+    }
+    
+    .page-content {
+        padding: 15px 20px;
+    }
+    
+    .diary-container {
+        height: 150px;
+        margin-bottom: 5px;
+    }
+    
+    .entry-text {
+        font-size: 0.8rem;
+        line-height: 1.4;
+    }
+    
+    .entry-date {
+        margin-bottom: 8px;
+    }
+    
+    .rose-frame-container {
+        display: none; /* Hide rose on small screens to fit controls */
+    }
+    
+    .audio-console {
+        padding: 8px;
+        margin-bottom: 8px;
+    }
+    
+    .vintage-knob {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .vacuum-tube {
+        height: 30px;
+        width: 18px;
+    }
+}
