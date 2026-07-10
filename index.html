@@ -1,51 +1,59 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Truman Chipotle</title>
-    <meta name="description" content="A ghostly silence. The diaries have faded.">
+    <meta
+      name="description"
+      content="A ghostly silence. The diaries have faded."
+    />
     <!-- Google Fonts: Special Elite for typewriter title, Plus Jakarta Sans for clean layouts, Courier Prime for atmospheric system code -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime&family=Plus+Jakarta+Sans:wght@200;300;400&family=Special+Elite&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Courier+Prime&family=Plus+Jakarta+Sans:wght@200;300;400&family=Special+Elite&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
     <!-- Canvas for the drifting ghostly mist and flashlight cursor light -->
     <canvas id="ambient-canvas"></canvas>
-    
+
     <!-- Ambient dark overlays and analogue texture -->
     <div class="overlay"></div>
 
     <div class="content-wrapper">
-        <header>
-            <div class="status-indicator" id="status-text">[ SYSTEM STATUS: QUIET ]</div>
-        </header>
+      <header>
+        <div class="status-indicator" id="status-text">
+          [ SYSTEM STATUS: QUIET ]
+        </div>
+      </header>
 
-        <main>
-            <h1 class="title">Truman Chipotle</h1>
-            <p class="tagline">An inquiry into the half-eaten</p>
-            <p class="description">
-                The diaries have faded to ash. The room is still. <br>
-                Something is quiet in the mist, waiting to transmit.
-            </p>
+      <main>
+        <h1 class="title">Truman Chipotle</h1>
+        <p class="tagline">
+          I haven't decided what to do with this space yet.
+        </p>
+        <p class="description">
+          Something is quiet in the mist, waiting to transmit.
+        </p>
+      </main>
 
-        </main>
-
-        <footer>
-            <div class="footer-left">
-                <button class="sound-toggle" id="sound-toggle">
-                    <span class="sound-icon"></span>
-                    <span class="sound-text">Listen to the void</span>
-                </button>
-            </div>
-            <div class="footer-right">
-                <span class="copyright">&copy; 1989–2026 TRUMAN CHIPOTLE.</span>
-            </div>
-        </footer>
+      <footer>
+        <div class="footer-left">
+          <button class="sound-toggle" id="sound-toggle">
+            <span class="sound-icon"></span>
+            <span class="sound-text">Take a moment to listen.</span>
+          </button>
+        </div>
+        <div class="footer-right">
+          <span class="copyright">&copy; 1989–2026 TRUMAN CHIPOTLE.</span>
+        </div>
+      </footer>
     </div>
 
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
