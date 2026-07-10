@@ -250,3 +250,47 @@ soundToggle.addEventListener('click', async () => {
     }
 });
 
+
+// --- Fetch Latest Bluesky Post ---
+async function updateLatestPost() {
+    const descriptionEl = document.querySelector('.description');
+    if (!descriptionEl) return;
+
+    try {
+        const response = await fetch('https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed?actor=trumanchipotle.com&limit=10');
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        
+        // Find the first post authored by trumanchipotle.com (not a repost)
+        const latestPostItem = data.feed.find(item => 
+            item.post && 
+            item.post.author && 
+            item.post.author.handle === 'trumanchipotle.com' &&
+            !item.reason
+        );
+
+        if (latestPostItem && latestPostItem.post.record && latestPostItem.post.record.text) {
+            const postText = latestPostItem.post.record.text;
+            const postUri = latestPostItem.post.uri;
+            
+            // Extract post ID from URI
+            const parts = postUri.split('/');
+            const postId = parts[parts.length - 1];
+            const postUrl = `https://bsky.app/profile/trumanchipotle.com/post/${postId}`;
+
+            const linkEl = document.createElement('a');
+            linkEl.href = postUrl;
+            linkEl.target = '_blank';
+            linkEl.rel = 'noopener noreferrer';
+            linkEl.textContent = postText;
+
+            descriptionEl.innerHTML = '';
+            descriptionEl.appendChild(linkEl);
+        }
+    } catch (error) {
+        console.error('Error fetching Bluesky post:', error);
+    }
+}
+
+updateLatestPost();
+
