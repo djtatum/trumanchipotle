@@ -136,6 +136,7 @@ main {
     opacity: 0;
     animation: ghostlyFadeIn 3.5s forwards ease-out;
     animation-delay: 1.8s;
+    white-space: pre-wrap;
 }
 
 .description a {
