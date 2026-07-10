@@ -103,10 +103,9 @@ main {
 }
 
 .title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Special Elite', monospace;
     font-size: 2.8rem;
-    font-weight: 300;
-    font-style: italic;
+    font-weight: 400;
     letter-spacing: 0.05em;
     color: #f0f4f5;
     text-shadow: 0 0 20px rgba(240, 244, 245, 0.08);
@@ -152,77 +151,6 @@ main {
     }
 }
 
-/* --- Minimal Subscription Form --- */
-.subscribe-form {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    max-width: 380px;
-    margin-top: 2rem;
-    border-bottom: 1px solid rgba(143, 162, 166, 0.15);
-    padding: 0.4rem 0;
-    opacity: 0;
-    animation: ghostlyFadeIn 3.5s forwards ease-out;
-    animation-delay: 2.5s;
-    transition: border-color 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.subscribe-form:focus-within {
-    border-color: rgba(143, 162, 166, 0.6);
-    box-shadow: 0 1px 0 rgba(143, 162, 166, 0.2);
-}
-
-.subscribe-form input[type="email"] {
-    background: transparent;
-    border: none;
-    outline: none;
-    color: #f0f4f5;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 300;
-    flex-grow: 1;
-    padding: 0.2rem 0;
-}
-
-.subscribe-form input[type="email"]::placeholder {
-    color: #4a5153;
-    transition: color 0.4s ease;
-}
-
-.subscribe-form input[type="email"]:focus::placeholder {
-    color: #2b3031;
-}
-
-.subscribe-form button {
-    background: transparent;
-    border: none;
-    outline: none;
-    color: #8fa2a6;
-    font-family: 'Courier Prime', monospace;
-    font-size: 0.75rem;
-    cursor: pointer;
-    letter-spacing: 0.15em;
-    padding: 0.2rem 0.6rem;
-    text-transform: uppercase;
-    transition: color 0.3s ease, text-shadow 0.3s ease;
-}
-
-.subscribe-form button:hover {
-    color: #f0f4f5;
-    text-shadow: 0 0 6px rgba(240, 244, 245, 0.4);
-}
-
-.form-feedback {
-    font-family: 'Courier Prime', monospace;
-    font-size: 0.72rem;
-    letter-spacing: 0.05em;
-    min-height: 1.2rem;
-    margin-top: 0.6rem;
-    color: #8fa2a6;
-    opacity: 0.75;
-    transition: opacity 0.3s ease;
-}
 
 /* --- Footer & Interactive Drone Toggle --- */
 footer {
