@@ -27,9 +27,10 @@ ENV HOSTNAME="0.0.0.0"
 # Install curl in alpine (uses apk, which is highly reliable and cached)
 RUN apk add --no-cache curl
 
-# Copy build artifacts and dependencies
+# Copy build artifacts and dependencies (including configuration mapping files)
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/tsconfig.json ./tsconfig.json
 COPY --from=builder /app/next.config.ts ./next.config.ts
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/payload.config.ts ./payload.config.ts
