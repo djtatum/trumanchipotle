@@ -1,0 +1,11 @@
+node_modules
+.next
+out
+.env
+.env*.local
+.git
+.gitignore
+*.md
+convert.py
+convert.js
+payload.db
