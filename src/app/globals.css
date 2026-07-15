@@ -8,7 +8,7 @@
 body {
     background-color: #050505;
     color: #c9cecf;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: var(--font-plus-jakarta-sans), sans-serif;
     height: 100vh;
     width: 100vw;
     overflow: hidden;
@@ -74,7 +74,7 @@ header {
 }
 
 .status-indicator {
-    font-family: 'Courier Prime', monospace;
+    font-family: var(--font-courier-prime), monospace;
     font-size: 0.72rem;
     letter-spacing: 0.25em;
     color: #8fa2a6;
@@ -103,7 +103,7 @@ main {
 }
 
 .title {
-    font-family: 'Special Elite', monospace;
+    font-family: var(--font-special-elite), monospace;
     font-size: 2.8rem;
     font-weight: 400;
     letter-spacing: 0.05em;
@@ -127,7 +127,7 @@ main {
 }
 
 .description {
-    font-family: 'Courier Prime', monospace;
+    font-family: var(--font-courier-prime), monospace;
     font-size: 0.8rem;
     line-height: 1.7;
     color: #7b8385;
@@ -171,7 +171,7 @@ footer {
     align-items: center;
     width: 100%;
     font-size: 0.7rem;
-    font-family: 'Courier Prime', monospace;
+    font-family: var(--font-courier-prime), monospace;
 }
 
 .sound-toggle {
