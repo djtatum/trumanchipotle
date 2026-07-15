@@ -100,6 +100,7 @@ main {
     align-items: center;
     gap: 1.2rem;
     margin: auto 0;
+    width: 100%;
 }
 
 .title {
@@ -161,6 +162,97 @@ main {
         filter: blur(0);
         transform: translateY(0);
     }
+}
+
+
+/* --- Story & Narrative Feed --- */
+.story-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    margin: auto 0;
+    max-height: 52vh; /* Keep within CRT layout */
+    width: 100%;
+}
+
+.story-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2.2rem;
+    overflow-y: auto;
+    width: 100%;
+    max-width: 480px;
+    padding: 0.5rem 1rem;
+    /* Custom thin scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(143, 162, 166, 0.2) transparent;
+}
+
+.story-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.story-content::-webkit-scrollbar-thumb {
+    background-color: rgba(143, 162, 166, 0.2);
+    border-radius: 2px;
+}
+
+.story-chapter {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    text-align: left;
+    border-left: 1px solid rgba(143, 162, 166, 0.15);
+    padding-left: 1rem;
+    opacity: 0;
+    animation: ghostlyFadeIn 3s forwards ease-out;
+}
+
+.story-chapter:nth-child(1) { animation-delay: 0.8s; }
+.story-chapter:nth-child(2) { animation-delay: 1.2s; }
+.story-chapter:nth-child(3) { animation-delay: 1.6s; }
+.story-chapter:nth-child(n+4) { animation-delay: 2.0s; }
+
+.chapter-title {
+    font-family: var(--font-special-elite), monospace;
+    font-size: 1.1rem;
+    color: #e58f8f; /* matches active rose glow */
+    letter-spacing: 0.05em;
+}
+
+.chapter-content {
+    font-family: var(--font-courier-prime), monospace;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: #a3abac;
+}
+
+.chapter-content p {
+    margin-bottom: 0.8rem;
+}
+
+.chapter-content p:last-child {
+    margin-bottom: 0;
+}
+
+.chapter-date {
+    font-family: var(--font-courier-prime), monospace;
+    font-size: 0.65rem;
+    color: #5b6365;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.no-story {
+    font-family: var(--font-courier-prime), monospace;
+    font-size: 0.8rem;
+    color: #5b6365;
+}
+
+.status-label {
+    color: #5b6365;
+    font-weight: bold;
 }
 
 

@@ -1,4 +1,6 @@
 import MainPage from "@/components/MainPage";
+import { getPayload } from "payload";
+import configPromise from "@payload-config";
 
 interface BlueskyPost {
   text: string;
@@ -41,7 +43,7 @@ async function getLatestBlueskyPost(): Promise<BlueskyPost> {
       const postText = latestPostItem.post.record.text;
       const postUri = latestPostItem.post.uri;
 
-      // Extract post ID from URI (e.g., at://did:plc:xxx/app.bsky.feed.post/yyy)
+      // Extract post ID from URI
       const parts = postUri.split("/");
       const postId = parts[parts.length - 1];
       const postUrl = `https://bsky.app/profile/trumanchipotle.com/post/${postId}`;
@@ -61,5 +63,23 @@ async function getLatestBlueskyPost(): Promise<BlueskyPost> {
 export default async function Home() {
   const latestPost = await getLatestBlueskyPost();
 
-  return <MainPage latestPost={latestPost} />;
+  let storyChapters: any[] = [];
+  try {
+    const payload = await getPayload({ config: configPromise });
+    const result = await payload.find({
+      collection: "stories",
+      where: {
+        status: {
+          equals: "published",
+        },
+      },
+      sort: "publishedDate", // Oldest first to read the continuous story from beginning to end
+      limit: 100,
+    });
+    storyChapters = result.docs;
+  } catch (error) {
+    console.error("Error fetching story chapters from Payload:", error);
+  }
+
+  return <MainPage latestPost={latestPost} storyChapters={storyChapters} />;
 }

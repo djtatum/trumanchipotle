@@ -3,14 +3,81 @@
 import React, { useState, useEffect, useRef } from "react";
 import AmbientCanvas from "./AmbientCanvas";
 
+interface StoryChapter {
+  id: string | number;
+  title: string;
+  content: any;
+  publishedDate: string;
+  status: string;
+}
+
 interface MainPageProps {
   latestPost: {
     text: string;
     url: string;
   };
+  storyChapters: StoryChapter[];
 }
 
-export default function MainPage({ latestPost }: MainPageProps) {
+function serializeLexical(node: any): React.ReactNode {
+  if (!node) return null;
+
+  if (node.type === "text") {
+    let text: React.ReactNode = node.text;
+    // Format is a bitmask: 1 = bold, 2 = italic, 4 = underline, 8 = strikethrough
+    if (node.format & 1) {
+      text = <strong key={Math.random()}>{text}</strong>;
+    }
+    if (node.format & 2) {
+      text = <em key={Math.random()}>{text}</em>;
+    }
+    if (node.format & 4) {
+      text = <u key={Math.random()}>{text}</u>;
+    }
+    if (node.format & 8) {
+      text = (
+        <span style={{ textDecoration: "line-through" }} key={Math.random()}>
+          {text}
+        </span>
+      );
+    }
+    return text;
+  }
+
+  const children = node.children?.map((child: any) => serializeLexical(child));
+
+  switch (node.type) {
+    case "root":
+      return <div key="root">{children}</div>;
+    case "paragraph":
+      return <p key={Math.random()}>{children}</p>;
+    case "heading":
+      const Tag = node.tag || "h3";
+      return <Tag key={Math.random()}>{children}</Tag>;
+    case "list":
+      const ListTag = node.listType === "ordered" ? "ol" : "ul";
+      return <ListTag key={Math.random()}>{children}</ListTag>;
+    case "listitem":
+      return <li key={Math.random()}>{children}</li>;
+    case "quote":
+      return <blockquote key={Math.random()}>{children}</blockquote>;
+    case "link":
+      return (
+        <a
+          href={node.fields?.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          key={Math.random()}
+        >
+          {children}
+        </a>
+      );
+    default:
+      return children;
+  }
+}
+
+export default function MainPage({ latestPost, storyChapters }: MainPageProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [statusText, setStatusText] = useState("[ SYSTEM STATUS: QUIET ]");
   const [soundText, setSoundText] = useState("Take a moment to listen.");
@@ -220,9 +287,35 @@ export default function MainPage({ latestPost }: MainPageProps) {
           </div>
         </header>
 
-        <main>
+        <main className="story-container">
           <h1 className="title">Truman Chipotle</h1>
+
+          <div className="story-content">
+            {storyChapters.length > 0 ? (
+              storyChapters.map((chapter) => (
+                <article key={chapter.id} className="story-chapter">
+                  {chapter.title && <h2 className="chapter-title">{chapter.title}</h2>}
+                  <div className="chapter-content">
+                    {serializeLexical(chapter.content?.root)}
+                  </div>
+                  {chapter.publishedDate && (
+                    <time className="chapter-date">
+                      {new Date(chapter.publishedDate).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </time>
+                  )}
+                </article>
+              ))
+            ) : (
+              <p className="no-story">The story is waiting to be written.</p>
+            )}
+          </div>
+
           <p className="description">
+            <span className="status-label">TRANSMISSION FEED: </span>
             <a href={latestPost.url} target="_blank" rel="noopener noreferrer">
               {latestPost.text}
             </a>
