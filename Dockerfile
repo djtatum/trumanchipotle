@@ -27,17 +27,13 @@ ENV HOSTNAME="0.0.0.0"
 # Install curl in alpine (uses apk, which is highly reliable and cached)
 RUN apk add --no-cache curl
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-# Copy build artifacts and dependencies
+# Copy build artifacts and dependencies (including next.config.ts)
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/next.config.ts ./next.config.ts
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/payload.config.ts ./payload.config.ts
 COPY --from=builder /app/.next ./.next
-
-USER nextjs
 
 EXPOSE 3000
 
