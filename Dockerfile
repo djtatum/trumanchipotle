@@ -27,14 +27,16 @@ ENV HOSTNAME="0.0.0.0"
 # Install curl in alpine (uses apk, which is highly reliable and cached)
 RUN apk add --no-cache curl
 
-# Copy build artifacts and dependencies (including next.config.ts)
+# Copy build artifacts and dependencies
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/next.config.ts ./next.config.ts
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/payload.config.ts ./payload.config.ts
+COPY --from=builder /app/src/migrations ./src/migrations
 COPY --from=builder /app/.next ./.next
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+# Run database migrations and start the server
+CMD ["sh", "-c", "npx payload migrate && npm start"]
