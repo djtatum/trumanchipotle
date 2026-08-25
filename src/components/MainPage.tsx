@@ -12,10 +12,6 @@ interface StoryChapter {
 }
 
 interface MainPageProps {
-  latestPost: {
-    text: string;
-    url: string;
-  };
   storyChapters: StoryChapter[];
 }
 
@@ -77,7 +73,7 @@ function serializeLexical(node: any): React.ReactNode {
   }
 }
 
-export default function MainPage({ latestPost, storyChapters }: MainPageProps) {
+export default function MainPage({ storyChapters }: MainPageProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [statusText, setStatusText] = useState("[ SYSTEM STATUS: QUIET ]");
   const [soundText, setSoundText] = useState("Take a moment to listen.");
@@ -313,13 +309,6 @@ export default function MainPage({ latestPost, storyChapters }: MainPageProps) {
               <p className="no-story">The story is waiting to be written.</p>
             )}
           </div>
-
-          <p className="description">
-            <span className="status-label">TRANSMISSION FEED: </span>
-            <a href={latestPost.url} target="_blank" rel="noopener noreferrer">
-              {latestPost.text}
-            </a>
-          </p>
         </main>
 
         <footer>
