@@ -2,10 +2,12 @@ import MainPage from "@/components/MainPage";
 import { getPayload } from "payload";
 import configPromise from "@payload-config";
 
+import type { Story } from "../../../payload-types";
+
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  let storyChapters: any[] = [];
+  let storyChapters: Story[] = [];
   try {
     const payload = await getPayload({ config: configPromise });
     const result = await payload.find({
@@ -15,7 +17,7 @@ export default async function Home() {
           equals: "published",
         },
       },
-      sort: "publishedDate", // Oldest first to read the continuous story from beginning to end
+      sort: "-publishedDate", // Newest first (newest to oldest)
       limit: 100,
     });
     storyChapters = result.docs;
