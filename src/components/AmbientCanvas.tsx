@@ -15,7 +15,7 @@ export default function AmbientCanvas() {
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
-    let particles: MistParticle[] = [];
+    const particles: MistParticle[] = [];
     const mouse = { x: -1000, y: -1000, active: false };
 
     const handleResize = () => {

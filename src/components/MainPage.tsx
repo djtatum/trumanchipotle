@@ -1,7 +1,29 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useSyncExternalStore,
+} from "react";
 import AmbientCanvas from "./AmbientCanvas";
+
+function subscribeMediaQuery(callback: () => void) {
+  if (typeof window === "undefined") return () => {};
+  const mql = window.matchMedia("(min-width: 768px)");
+  mql.addEventListener("change", callback);
+  return () => mql.removeEventListener("change", callback);
+}
+
+function getDesktopSnapshot(): boolean {
+  if (typeof window === "undefined") return true;
+  return window.matchMedia("(min-width: 768px)").matches;
+}
+
+function getServerDesktopSnapshot(): boolean {
+  return true;
+}
 
 interface StoryChapter {
   id: string | number;
@@ -135,8 +157,11 @@ function serializeLexical(node: any, index: number = 0): React.ReactNode {
 
 export default function MainPage({ storyChapters }: MainPageProps) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [statusText, setStatusText] = useState("[ SYSTEM STATUS: QUIET ]");
-  const [soundText, setSoundText] = useState("Take a moment to listen.");
+  const soundText = isPlaying ? "Silence the void" : "Listen to the void";
+  const statusText = isPlaying ? "[ SYSTEM STATUS: TUNED IN ]" : "[ SYSTEM STATUS: QUIET ]";
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const touchStartXRef = useRef<number | null>(null);
 
   const audioCtxRef = useRef<AudioContext | null>(null);
   const masterGainRef = useRef<GainNode | null>(null);
@@ -147,17 +172,65 @@ export default function MainPage({ storyChapters }: MainPageProps) {
   const crackleIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const isPlayingRef = useRef(false);
 
-  // Sync ref with state to avoid stale closure in setInterval and setTimeouts
   useEffect(() => {
     isPlayingRef.current = isPlaying;
-    if (isPlaying) {
-      setSoundText("Silence the void");
-      setStatusText("[ SYSTEM STATUS: TUNED IN ]");
-    } else {
-      setSoundText("Listen to the void");
-      setStatusText("[ SYSTEM STATUS: QUIET ]");
-    }
   }, [isPlaying]);
+
+  const isDesktop = useSyncExternalStore(
+    subscribeMediaQuery,
+    getDesktopSnapshot,
+    getServerDesktopSnapshot
+  );
+
+  const itemsPerPage = isDesktop ? 2 : 1;
+  const maxIndex = Math.max(0, storyChapters.length - itemsPerPage);
+  const safeCurrentIndex = Math.min(currentIndex, maxIndex);
+
+  const handlePrev = useCallback(() => {
+    setCurrentIndex((prev) => Math.max(0, Math.min(prev, maxIndex) - 1));
+  }, [maxIndex]);
+
+  const handleNext = useCallback(() => {
+    setCurrentIndex((prev) => Math.min(maxIndex, Math.min(prev, maxIndex) + 1));
+  }, [maxIndex]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (["INPUT", "TEXTAREA"].includes((e.target as HTMLElement)?.tagName)) return;
+      if (e.key === "ArrowLeft") {
+        handlePrev();
+      } else if (e.key === "ArrowRight") {
+        handleNext();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handlePrev, handleNext]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartXRef.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartXRef.current === null) return;
+    const diff = touchStartXRef.current - e.changedTouches[0].clientX;
+    touchStartXRef.current = null;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) {
+        handleNext();
+      } else {
+        handlePrev();
+      }
+    }
+  };
+
+  const handleCardClick = (index: number) => {
+    if (index < safeCurrentIndex) {
+      setCurrentIndex(index);
+    } else if (index > safeCurrentIndex + itemsPerPage - 1) {
+      setCurrentIndex(Math.min(index, maxIndex));
+    }
+  };
 
   const triggerPop = () => {
     const audioCtx = audioCtxRef.current;
@@ -346,29 +419,130 @@ export default function MainPage({ storyChapters }: MainPageProps) {
         <main className="story-container">
           <h1 className="title">Truman Chipotle</h1>
 
-          <div className="story-content">
-            {storyChapters.length > 0 ? (
-              storyChapters.map((chapter) => (
-                <article key={chapter.id} className="story-chapter">
-                  {chapter.title && <h2 className="chapter-title">{chapter.title}</h2>}
-                  <div className="chapter-content">
-                    {serializeLexical(chapter.content?.root)}
+          {storyChapters.length > 0 ? (
+            <div className="slideshow-container">
+              {storyChapters.length > itemsPerPage && (
+                <div className="slideshow-header">
+                  <button
+                    type="button"
+                    className="slideshow-btn prev-btn"
+                    onClick={handlePrev}
+                    disabled={safeCurrentIndex === 0}
+                    aria-label="Previous story"
+                    title="Previous story"
+                  >
+                    <span className="btn-chevron">&larr;</span>
+                    <span className="btn-text">PREV</span>
+                  </button>
+
+                  <div className="slideshow-pagination">
+                    <span className="slideshow-counter">
+                      [ TRANSMISSION {String(safeCurrentIndex + 1).padStart(2, "0")}
+                      {itemsPerPage > 1 && storyChapters.length > 1
+                        ? `–${String(Math.min(safeCurrentIndex + itemsPerPage, storyChapters.length)).padStart(2, "0")}`
+                        : ""} / {String(storyChapters.length).padStart(2, "0")} ]
+                    </span>
+                    <div className="slideshow-dots" role="tablist">
+                      {Array.from({ length: maxIndex + 1 }).map((_, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          className={`slideshow-dot ${idx === safeCurrentIndex ? "active" : ""}`}
+                          onClick={() => setCurrentIndex(idx)}
+                          aria-label={`Slide ${idx + 1}`}
+                          role="tab"
+                          aria-selected={idx === safeCurrentIndex}
+                        />
+                      ))}
+                    </div>
                   </div>
-                  {chapter.publishedDate && (
-                    <time className="chapter-date">
-                      {new Date(chapter.publishedDate).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </time>
-                  )}
-                </article>
-              ))
-            ) : (
-              <p className="no-story">The story is waiting to be written.</p>
-            )}
-          </div>
+
+                  <button
+                    type="button"
+                    className="slideshow-btn next-btn"
+                    onClick={handleNext}
+                    disabled={safeCurrentIndex >= maxIndex}
+                    aria-label="Next story"
+                    title="Next story"
+                  >
+                    <span className="btn-text">NEXT</span>
+                    <span className="btn-chevron">&rarr;</span>
+                  </button>
+                </div>
+              )}
+
+              <div
+                className="slideshow-stage"
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+              >
+                <div
+                  className="slideshow-track"
+                  style={{
+                    transform: `translateX(calc(-1 * ${safeCurrentIndex} * ((100% + var(--slideshow-gap)) / ${itemsPerPage})))`,
+                  }}
+                >
+                  {storyChapters.map((chapter, index) => {
+                    const focusStart = safeCurrentIndex;
+                    const focusEnd = safeCurrentIndex + itemsPerPage - 1;
+                    let distance = 0;
+                    if (index < focusStart) {
+                      distance = focusStart - index;
+                    } else if (index > focusEnd) {
+                      distance = index - focusEnd;
+                    }
+
+                    const inFocus = distance === 0;
+                    const blurPx = inFocus ? 0 : Math.min(distance * 3.5, 14);
+                    const opacityVal = inFocus ? 1 : Math.max(0.6 - (distance - 1) * 0.22, 0.15);
+                    const scaleVal = inFocus ? 1 : Math.max(0.96 - (distance - 1) * 0.04, 0.86);
+
+                    return (
+                      <article
+                        key={chapter.id}
+                        className={`story-chapter ${inFocus ? "in-focus" : "out-of-focus"}`}
+                        style={
+                          {
+                            filter: `blur(${blurPx}px)`,
+                            opacity: opacityVal,
+                            transform: `scale(${scaleVal})`,
+                            zIndex: inFocus ? 10 : 10 - distance,
+                            cursor: inFocus ? "default" : "pointer",
+                            "--card-blur": `${blurPx}px`,
+                            "--card-opacity": opacityVal,
+                            "--card-scale": scaleVal,
+                          } as React.CSSProperties
+                        }
+                        onClick={() => handleCardClick(index)}
+                        title={!inFocus ? "Click to bring chapter into focus" : undefined}
+                      >
+                        {!inFocus && (
+                          <div className="focus-hint">
+                            <span className="focus-hint-badge">[ FOCUS ]</span>
+                          </div>
+                        )}
+                        {chapter.title && <h2 className="chapter-title">{chapter.title}</h2>}
+                        <div className="chapter-content">
+                          {serializeLexical(chapter.content?.root)}
+                        </div>
+                        {chapter.publishedDate && (
+                          <time className="chapter-date">
+                            {new Date(chapter.publishedDate).toLocaleDateString("en-US", {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            })}
+                          </time>
+                        )}
+                      </article>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p className="no-story">The story is waiting to be written.</p>
+          )}
         </main>
 
         <footer>
