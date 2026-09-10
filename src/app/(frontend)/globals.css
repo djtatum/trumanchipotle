@@ -187,9 +187,8 @@ main {
 
 /* --- Story & Narrative Feed --- */
 :root {
-    --slideshow-peek: 3.5rem;
-    --slideshow-gap: 2rem;
-    --items-per-page: 2;
+    --card-width: min(700px, 64vw);
+    --slideshow-gap: 2.5rem;
 }
 
 .story-container {
@@ -207,9 +206,9 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.25rem;
+    gap: 1.5rem;
     width: 100%;
-    max-width: 1240px;
+    max-width: 1320px;
     position: relative;
 }
 
@@ -219,8 +218,8 @@ main {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    max-width: 960px;
-    padding: 0 1rem;
+    max-width: var(--card-width);
+    padding: 0 0.5rem;
     box-sizing: border-box;
 }
 
@@ -308,11 +307,11 @@ main {
 .slideshow-stage {
     width: 100%;
     overflow: hidden;
-    padding: 1.25rem var(--slideshow-peek);
+    padding: 1.5rem 0 2rem;
     box-sizing: border-box;
     position: relative;
-    mask-image: linear-gradient(to right, transparent 0%, black var(--slideshow-peek), black calc(100% - var(--slideshow-peek)), transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, black var(--slideshow-peek), black calc(100% - var(--slideshow-peek)), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
 }
 
 .slideshow-track {
@@ -325,18 +324,20 @@ main {
 
 /* Story Chapter Card */
 .story-chapter {
-    flex: 0 0 calc((100% - var(--slideshow-gap)) / var(--items-per-page));
+    flex: 0 0 var(--card-width);
+    width: var(--card-width);
     min-width: 0;
-    height: 520px;
+    min-height: 380px;
+    height: auto;
     display: flex;
     flex-direction: column;
-    gap: 0.9rem;
+    gap: 1.1rem;
     text-align: left;
-    background: rgba(12, 14, 15, 0.65);
+    background: rgba(12, 14, 15, 0.7);
     border: 1px solid rgba(143, 162, 166, 0.12);
     border-left: 3px solid rgba(229, 143, 143, 0.5);
-    border-radius: 4px;
-    padding: 1.6rem 1.75rem;
+    border-radius: 6px;
+    padding: 2rem 2.2rem 1.8rem;
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     box-sizing: border-box;
@@ -351,21 +352,22 @@ main {
 }
 
 .story-chapter.in-focus {
-    border-left-color: rgba(229, 143, 143, 0.7);
-    box-shadow: 0 6px 28px rgba(0, 0, 0, 0.45);
+    border-left-color: rgba(229, 143, 143, 0.85);
+    background: rgba(14, 17, 19, 0.82);
+    box-shadow: 0 8px 36px rgba(0, 0, 0, 0.6), 0 0 24px rgba(229, 143, 143, 0.08);
 }
 
 .story-chapter.in-focus:hover {
     border-color: rgba(143, 162, 166, 0.28);
     border-left-color: rgba(229, 143, 143, 0.95);
-    background: rgba(16, 20, 22, 0.75);
+    background: rgba(16, 20, 22, 0.88);
     transform: translateY(-2px) scale(1) !important;
-    box-shadow: 0 10px 34px rgba(0, 0, 0, 0.55), 0 0 20px rgba(229, 143, 143, 0.08);
+    box-shadow: 0 12px 42px rgba(0, 0, 0, 0.7), 0 0 28px rgba(229, 143, 143, 0.12);
 }
 
 .story-chapter.out-of-focus:hover {
-    filter: blur(calc(var(--card-blur, 4px) * 0.55)) !important;
-    opacity: calc(var(--card-opacity, 0.5) + 0.18) !important;
+    filter: blur(calc(var(--card-blur, 4px) * 0.45)) !important;
+    opacity: calc(var(--card-opacity, 0.5) + 0.22) !important;
     transform: scale(calc(var(--card-scale, 0.95) + 0.02)) !important;
     border-color: rgba(229, 143, 143, 0.35);
 }
@@ -527,32 +529,30 @@ footer {
 /* --- Responsive Adjustments --- */
 @media (max-width: 1024px) {
     :root {
-        --slideshow-peek: 2.5rem;
-        --slideshow-gap: 1.5rem;
+        --card-width: min(620px, 72vw);
+        --slideshow-gap: 2rem;
     }
     .story-chapter {
-        height: 490px;
-        padding: 1.4rem 1.5rem;
+        padding: 1.75rem 1.8rem 1.5rem;
     }
 }
 
 @media (max-width: 767px) {
     :root {
-        --items-per-page: 1;
-        --slideshow-peek: 1.25rem;
-        --slideshow-gap: 1rem;
+        --card-width: 84vw;
+        --slideshow-gap: 1.25rem;
     }
     .slideshow-header {
-        max-width: 100%;
-        padding: 0 0.5rem;
+        max-width: var(--card-width);
+        padding: 0 0.25rem;
     }
     .slideshow-btn {
         padding: 0.45rem 0.8rem;
         font-size: 0.7rem;
     }
     .story-chapter {
-        height: 460px;
-        padding: 1.3rem 1.3rem;
+        padding: 1.5rem 1.4rem 1.3rem;
+        min-height: 320px;
     }
 }
 
@@ -569,9 +569,9 @@ footer {
         padding: 0 0.5rem;
     }
     .content-wrapper {
-        width: 95%;
+        width: 96%;
         min-height: 100vh;
-        padding: 1.5rem 0.5rem 1.5rem;
+        padding: 1.5rem 0.4rem 1.5rem;
         gap: 1.5rem;
     }
     .slideshow-counter {

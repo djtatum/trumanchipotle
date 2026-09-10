@@ -1,29 +1,7 @@
 "use client";
 
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-  useSyncExternalStore,
-} from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import AmbientCanvas from "./AmbientCanvas";
-
-function subscribeMediaQuery(callback: () => void) {
-  if (typeof window === "undefined") return () => {};
-  const mql = window.matchMedia("(min-width: 768px)");
-  mql.addEventListener("change", callback);
-  return () => mql.removeEventListener("change", callback);
-}
-
-function getDesktopSnapshot(): boolean {
-  if (typeof window === "undefined") return true;
-  return window.matchMedia("(min-width: 768px)").matches;
-}
-
-function getServerDesktopSnapshot(): boolean {
-  return true;
-}
 
 interface StoryChapter {
   id: string | number;
@@ -176,14 +154,7 @@ export default function MainPage({ storyChapters }: MainPageProps) {
     isPlayingRef.current = isPlaying;
   }, [isPlaying]);
 
-  const isDesktop = useSyncExternalStore(
-    subscribeMediaQuery,
-    getDesktopSnapshot,
-    getServerDesktopSnapshot
-  );
-
-  const itemsPerPage = isDesktop ? 2 : 1;
-  const maxIndex = Math.max(0, storyChapters.length - itemsPerPage);
+  const maxIndex = Math.max(0, storyChapters.length - 1);
   const safeCurrentIndex = Math.min(currentIndex, maxIndex);
 
   const handlePrev = useCallback(() => {
@@ -225,10 +196,8 @@ export default function MainPage({ storyChapters }: MainPageProps) {
   };
 
   const handleCardClick = (index: number) => {
-    if (index < safeCurrentIndex) {
+    if (index !== safeCurrentIndex) {
       setCurrentIndex(index);
-    } else if (index > safeCurrentIndex + itemsPerPage - 1) {
-      setCurrentIndex(Math.min(index, maxIndex));
     }
   };
 
@@ -421,7 +390,7 @@ export default function MainPage({ storyChapters }: MainPageProps) {
 
           {storyChapters.length > 0 ? (
             <div className="slideshow-container">
-              {storyChapters.length > itemsPerPage && (
+              {storyChapters.length > 1 && (
                 <div className="slideshow-header">
                   <button
                     type="button"
@@ -437,13 +406,10 @@ export default function MainPage({ storyChapters }: MainPageProps) {
 
                   <div className="slideshow-pagination">
                     <span className="slideshow-counter">
-                      [ TRANSMISSION {String(safeCurrentIndex + 1).padStart(2, "0")}
-                      {itemsPerPage > 1 && storyChapters.length > 1
-                        ? `–${String(Math.min(safeCurrentIndex + itemsPerPage, storyChapters.length)).padStart(2, "0")}`
-                        : ""} / {String(storyChapters.length).padStart(2, "0")} ]
+                      [ TRANSMISSION {String(safeCurrentIndex + 1).padStart(2, "0")} / {String(storyChapters.length).padStart(2, "0")} ]
                     </span>
                     <div className="slideshow-dots" role="tablist">
-                      {Array.from({ length: maxIndex + 1 }).map((_, idx) => (
+                      {Array.from({ length: storyChapters.length }).map((_, idx) => (
                         <button
                           key={idx}
                           type="button"
@@ -479,23 +445,15 @@ export default function MainPage({ storyChapters }: MainPageProps) {
                 <div
                   className="slideshow-track"
                   style={{
-                    transform: `translateX(calc(-1 * ${safeCurrentIndex} * ((100% + var(--slideshow-gap)) / ${itemsPerPage})))`,
+                    transform: `translateX(calc((100% - var(--card-width)) / 2 - ${safeCurrentIndex} * (var(--card-width) + var(--slideshow-gap))))`,
                   }}
                 >
                   {storyChapters.map((chapter, index) => {
-                    const focusStart = safeCurrentIndex;
-                    const focusEnd = safeCurrentIndex + itemsPerPage - 1;
-                    let distance = 0;
-                    if (index < focusStart) {
-                      distance = focusStart - index;
-                    } else if (index > focusEnd) {
-                      distance = index - focusEnd;
-                    }
-
+                    const distance = Math.abs(index - safeCurrentIndex);
                     const inFocus = distance === 0;
-                    const blurPx = inFocus ? 0 : Math.min(distance * 3.5, 14);
-                    const opacityVal = inFocus ? 1 : Math.max(0.6 - (distance - 1) * 0.22, 0.15);
-                    const scaleVal = inFocus ? 1 : Math.max(0.96 - (distance - 1) * 0.04, 0.86);
+                    const blurPx = inFocus ? 0 : Math.min(distance * 4, 16);
+                    const opacityVal = inFocus ? 1 : Math.max(0.52 - (distance - 1) * 0.22, 0.12);
+                    const scaleVal = inFocus ? 1 : Math.max(0.95 - (distance - 1) * 0.05, 0.82);
 
                     return (
                       <article
@@ -506,7 +464,7 @@ export default function MainPage({ storyChapters }: MainPageProps) {
                             filter: `blur(${blurPx}px)`,
                             opacity: opacityVal,
                             transform: `scale(${scaleVal})`,
-                            zIndex: inFocus ? 10 : 10 - distance,
+                            zIndex: inFocus ? 10 : Math.max(1, 10 - distance),
                             cursor: inFocus ? "default" : "pointer",
                             "--card-blur": `${blurPx}px`,
                             "--card-opacity": opacityVal,
