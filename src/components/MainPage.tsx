@@ -15,55 +15,115 @@ interface MainPageProps {
   storyChapters: StoryChapter[];
 }
 
-function serializeLexical(node: any): React.ReactNode {
+function serializeLexical(node: any, index: number = 0): React.ReactNode {
   if (!node) return null;
+
+  if (node.type === "linebreak") {
+    return <br key={`br-${index}`} />;
+  }
+
+  if (node.type === "tab") {
+    return (
+      <span key={`tab-${index}`} style={{ display: "inline-block", width: "2em" }}>
+        &#9;
+      </span>
+    );
+  }
 
   if (node.type === "text") {
     let text: React.ReactNode = node.text;
-    // Format is a bitmask: 1 = bold, 2 = italic, 4 = underline, 8 = strikethrough
+    // Format bitmask in Lexical:
+    // 1 = bold, 2 = italic, 4 = strikethrough, 8 = underline, 16 = code, 32 = subscript, 64 = superscript
     if (node.format & 1) {
-      text = <strong key={Math.random()}>{text}</strong>;
+      text = <strong key="b">{text}</strong>;
     }
     if (node.format & 2) {
-      text = <em key={Math.random()}>{text}</em>;
+      text = <em key="i">{text}</em>;
     }
     if (node.format & 4) {
-      text = <u key={Math.random()}>{text}</u>;
-    }
-    if (node.format & 8) {
       text = (
-        <span style={{ textDecoration: "line-through" }} key={Math.random()}>
+        <span style={{ textDecoration: "line-through" }} key="s">
           {text}
         </span>
       );
     }
-    return text;
+    if (node.format & 8) {
+      text = <u key="u">{text}</u>;
+    }
+    if (node.format & 16) {
+      text = <code key="c">{text}</code>;
+    }
+    if (node.format & 32) {
+      text = <sub key="sub">{text}</sub>;
+    }
+    if (node.format & 64) {
+      text = <sup key="sup">{text}</sup>;
+    }
+    return <React.Fragment key={`t-${index}`}>{text}</React.Fragment>;
   }
 
-  const children = node.children?.map((child: any) => serializeLexical(child));
+  const children = node.children?.map((child: any, i: number) => serializeLexical(child, i));
 
   switch (node.type) {
     case "root":
-      return <div key="root">{children}</div>;
-    case "paragraph":
-      return <p key={Math.random()}>{children}</p>;
-    case "heading":
-      const Tag = node.tag || "h3";
-      return <Tag key={Math.random()}>{children}</Tag>;
-    case "list":
-      const ListTag = node.listType === "ordered" ? "ol" : "ul";
-      return <ListTag key={Math.random()}>{children}</ListTag>;
+      return <React.Fragment key="root">{children}</React.Fragment>;
+    case "paragraph": {
+      // If paragraph has no children or empty text, render a <br /> so it occupies vertical space
+      const isEmpty =
+        !node.children ||
+        node.children.length === 0 ||
+        (node.children.length === 1 &&
+          node.children[0].type === "text" &&
+          !node.children[0].text?.trim());
+
+      const style: React.CSSProperties = {};
+      if (node.format) {
+        style.textAlign = node.format;
+      }
+      if (node.indent && node.indent > 0) {
+        style.paddingInlineStart = `${node.indent * 2}rem`;
+      }
+
+      return (
+        <p key={`p-${index}`} style={Object.keys(style).length > 0 ? style : undefined}>
+          {isEmpty ? <br /> : children}
+        </p>
+      );
+    }
+    case "heading": {
+      const Tag = (node.tag || "h3") as any;
+      const style: React.CSSProperties = {};
+      if (node.format) {
+        style.textAlign = node.format;
+      }
+      return (
+        <Tag key={`h-${index}`} style={Object.keys(style).length > 0 ? style : undefined}>
+          {children}
+        </Tag>
+      );
+    }
+    case "list": {
+      const ListTag = (node.listType === "ordered" ? "ol" : "ul") as any;
+      return <ListTag key={`list-${index}`}>{children}</ListTag>;
+    }
     case "listitem":
-      return <li key={Math.random()}>{children}</li>;
+      return <li key={`li-${index}`}>{children}</li>;
     case "quote":
-      return <blockquote key={Math.random()}>{children}</blockquote>;
+      return <blockquote key={`quote-${index}`}>{children}</blockquote>;
+    case "horizontalrule":
+      return (
+        <hr
+          key={`hr-${index}`}
+          style={{ borderColor: "rgba(143, 162, 166, 0.2)", margin: "1.5rem 0" }}
+        />
+      );
     case "link":
       return (
         <a
           href={node.fields?.url}
           target="_blank"
           rel="noopener noreferrer"
-          key={Math.random()}
+          key={`a-${index}`}
         >
           {children}
         </a>
