@@ -135,8 +135,7 @@ function serializeLexical(node: any, index: number = 0): React.ReactNode {
 
 export default function MainPage({ storyChapters }: MainPageProps) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const soundText = isPlaying ? "Silence the void" : "Listen to the void";
-  const statusText = isPlaying ? "[ SYSTEM STATUS: TUNED IN ]" : "[ SYSTEM STATUS: QUIET ]";
+  const soundText = isPlaying ? "Silence the void" : "Tune into the void";
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const touchStartXRef = useRef<number | null>(null);
@@ -380,9 +379,16 @@ export default function MainPage({ storyChapters }: MainPageProps) {
       <div className="overlay" />
       <div className="content-wrapper">
         <header>
-          <div className="status-indicator" id="status-text">
-            {statusText}
-          </div>
+          <button
+            type="button"
+            className={`sound-toggle ${isPlaying ? "active" : ""}`}
+            id="sound-toggle"
+            onClick={handleSoundToggle}
+            aria-label={isPlaying ? "Silence ambient audio" : "Tune into ambient audio"}
+          >
+            <span className="sound-icon" />
+            <span className="sound-text">{soundText}</span>
+          </button>
         </header>
 
         <main className="story-container">
@@ -532,19 +538,7 @@ export default function MainPage({ storyChapters }: MainPageProps) {
         </main>
 
         <footer>
-          <div className="footer-left">
-            <button
-              className={`sound-toggle ${isPlaying ? "active" : ""}`}
-              id="sound-toggle"
-              onClick={handleSoundToggle}
-            >
-              <span className="sound-icon" />
-              <span className="sound-text">{soundText}</span>
-            </button>
-          </div>
-          <div className="footer-right">
-            <span className="copyright">&copy; 1989–2026 TRUMAN CHIPOTLE.</span>
-          </div>
+          <span className="copyright">&copy; 1989–2026 TRUMAN CHIPOTLE.</span>
         </footer>
       </div>
     </>
