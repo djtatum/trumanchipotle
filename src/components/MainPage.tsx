@@ -392,18 +392,6 @@ export default function MainPage({ storyChapters }: MainPageProps) {
             <div className="slideshow-container">
               {storyChapters.length > 1 && (
                 <div className="slideshow-header">
-                  <button
-                    type="button"
-                    className="slideshow-btn prev-btn"
-                    onClick={handlePrev}
-                    disabled={safeCurrentIndex === 0}
-                    aria-label="Previous story"
-                    title="Previous story"
-                  >
-                    <span className="btn-chevron">&larr;</span>
-                    <span className="btn-text">PREV</span>
-                  </button>
-
                   <div className="slideshow-pagination">
                     <span className="slideshow-counter">
                       [ TRANSMISSION {String(safeCurrentIndex + 1).padStart(2, "0")} / {String(storyChapters.length).padStart(2, "0")} ]
@@ -422,30 +410,44 @@ export default function MainPage({ storyChapters }: MainPageProps) {
                       ))}
                     </div>
                   </div>
-
-                  <button
-                    type="button"
-                    className="slideshow-btn next-btn"
-                    onClick={handleNext}
-                    disabled={safeCurrentIndex >= maxIndex}
-                    aria-label="Next story"
-                    title="Next story"
-                  >
-                    <span className="btn-text">NEXT</span>
-                    <span className="btn-chevron">&rarr;</span>
-                  </button>
                 </div>
               )}
 
-              <div
-                className="slideshow-stage"
-                onTouchStart={handleTouchStart}
-                onTouchEnd={handleTouchEnd}
-              >
+              <div className="slideshow-stage-wrapper">
+                {storyChapters.length > 1 && (
+                  <button
+                    type="button"
+                    className="slideshow-circle-btn prev-btn"
+                    onClick={handlePrev}
+                    disabled={safeCurrentIndex === 0}
+                    aria-label="Previous story"
+                    title="Previous story"
+                  >
+                    <svg
+                      className="circle-btn-icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <line x1="19" y1="12" x2="5" y2="12" />
+                      <polyline points="12 19 5 12 12 5" />
+                    </svg>
+                  </button>
+                )}
+
+                <div
+                  className="slideshow-stage"
+                  onTouchStart={handleTouchStart}
+                  onTouchEnd={handleTouchEnd}
+                >
                 <div
                   className="slideshow-track"
                   style={{
-                    transform: `translateX(calc((100% - var(--card-width)) / 2 - ${safeCurrentIndex} * (var(--card-width) + var(--slideshow-gap))))`,
+                    transform: `translateX(calc(-1 * ${safeCurrentIndex} * (var(--card-width) + var(--slideshow-gap))))`,
                   }}
                 >
                   {storyChapters.map((chapter, index) => {
@@ -497,7 +499,33 @@ export default function MainPage({ storyChapters }: MainPageProps) {
                   })}
                 </div>
               </div>
+
+              {storyChapters.length > 1 && (
+                <button
+                  type="button"
+                  className="slideshow-circle-btn next-btn"
+                  onClick={handleNext}
+                  disabled={safeCurrentIndex >= maxIndex}
+                  aria-label="Next story"
+                  title="Next story"
+                >
+                  <svg
+                    className="circle-btn-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </button>
+              )}
             </div>
+          </div>
           ) : (
             <p className="no-story">The story is waiting to be written.</p>
           )}
