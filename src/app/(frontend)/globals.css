@@ -499,6 +499,7 @@ main {
 }
 
 .chapter-content p {
+    text-indent: 2em;
     margin-bottom: 0.8rem;
     white-space: pre-wrap;
     word-break: break-word;

@@ -23,6 +23,8 @@ function serializeLexical(node: any, index: number = 0): React.ReactNode {
   }
 
   if (node.type === "tab") {
+    // If a tab is at the start of a paragraph, omit it so it doesn't double-indent with CSS text-indent: 2em
+    if (index === 0) return null;
     return (
       <span key={`tab-${index}`} style={{ display: "inline-block", width: "2em" }}>
         &#9;
@@ -79,6 +81,9 @@ function serializeLexical(node: any, index: number = 0): React.ReactNode {
       const style: React.CSSProperties = {};
       if (node.format) {
         style.textAlign = node.format;
+        if (node.format !== "left") {
+          style.textIndent = "0";
+        }
       }
       if (node.indent && node.indent > 0) {
         style.paddingInlineStart = `${node.indent * 2}rem`;
