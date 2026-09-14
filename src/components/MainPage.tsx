@@ -84,9 +84,72 @@ function serializeLexical(node: any, index: number = 0): React.ReactNode {
         style.paddingInlineStart = `${node.indent * 2}rem`;
       }
 
+      if (isEmpty) {
+        return (
+          <p key={`p-${index}`} style={Object.keys(style).length > 0 ? style : undefined}>
+            <br />
+          </p>
+        );
+      }
+
+      // Check if paragraph contains consecutive linebreaks (double br)
+      const hasDoubleLinebreak = node.children?.some(
+        (child: any, i: number) =>
+          child?.type === "linebreak" && node.children[i + 1]?.type === "linebreak"
+      );
+
+      if (hasDoubleLinebreak) {
+        const groups: any[][] = [];
+        let currentGroup: any[] = [];
+        const items = node.children || [];
+        let i = 0;
+        while (i < items.length) {
+          if (
+            items[i]?.type === "linebreak" &&
+            items[i + 1]?.type === "linebreak"
+          ) {
+            while (i < items.length && items[i]?.type === "linebreak") {
+              i++;
+            }
+            if (currentGroup.length > 0) {
+              groups.push(currentGroup);
+              currentGroup = [];
+            }
+          } else {
+            currentGroup.push(items[i]);
+            i++;
+          }
+        }
+        if (currentGroup.length > 0) {
+          groups.push(currentGroup);
+        }
+
+        return (
+          <React.Fragment key={`p-group-${index}`}>
+            {groups.map((grp, gIdx) => {
+              let start = 0;
+              let end = grp.length;
+              while (start < end && grp[start]?.type === "linebreak") start++;
+              while (end > start && grp[end - 1]?.type === "linebreak") end--;
+              const trimmed = grp.slice(start, end);
+              if (trimmed.length === 0) return null;
+
+              return (
+                <p
+                  key={`p-${index}-${gIdx}`}
+                  style={Object.keys(style).length > 0 ? style : undefined}
+                >
+                  {trimmed.map((child: any, cIdx: number) => serializeLexical(child, cIdx))}
+                </p>
+              );
+            })}
+          </React.Fragment>
+        );
+      }
+
       return (
         <p key={`p-${index}`} style={Object.keys(style).length > 0 ? style : undefined}>
-          {isEmpty ? <br /> : children}
+          {children}
         </p>
       );
     }
