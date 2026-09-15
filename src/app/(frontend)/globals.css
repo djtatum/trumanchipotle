@@ -586,8 +586,8 @@ footer {
 
 @media (max-width: 767px) {
     :root {
-        --card-width: 84vw;
-        --slideshow-gap: 1.25rem;
+        --card-width: min(350px, calc(100vw - 5.5rem));
+        --slideshow-gap: 1rem;
     }
     .slideshow-header {
         max-width: var(--card-width);
@@ -595,22 +595,45 @@ footer {
     }
     .slideshow-circle-btn {
         top: 13.25rem;
-        width: 38px;
-        height: 38px;
+        width: 32px;
+        height: 32px;
     }
     .slideshow-circle-btn.prev-btn {
-        left: max(0.5rem, calc(50% - (var(--card-width) / 2) - 38px - 8px));
+        left: max(0.25rem, calc(50% - (var(--card-width) / 2) - 32px - 6px));
     }
     .slideshow-circle-btn.next-btn {
-        right: max(0.5rem, calc(50% - (var(--card-width) / 2) - 38px - 8px));
+        right: max(0.25rem, calc(50% - (var(--card-width) / 2) - 32px - 6px));
     }
     .circle-btn-icon {
-        width: 17px;
-        height: 17px;
+        width: 14px;
+        height: 14px;
     }
     .story-chapter {
-        padding: 1.5rem 1.4rem 1.3rem;
+        padding: 1.4rem 1.25rem 1.2rem;
         min-height: 320px;
+    }
+}
+
+@media (max-width: 420px) {
+    :root {
+        --card-width: calc(100vw - 4.75rem);
+    }
+    .slideshow-circle-btn {
+        width: 28px;
+        height: 28px;
+    }
+    .slideshow-circle-btn.prev-btn {
+        left: max(0.2rem, calc(50% - (var(--card-width) / 2) - 28px - 4px));
+    }
+    .slideshow-circle-btn.next-btn {
+        right: max(0.2rem, calc(50% - (var(--card-width) / 2) - 28px - 4px));
+    }
+    .circle-btn-icon {
+        width: 13px;
+        height: 13px;
+    }
+    .story-chapter {
+        padding: 1.25rem 1rem 1.1rem;
     }
 }
 
