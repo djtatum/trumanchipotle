@@ -203,7 +203,7 @@ function serializeLexical(node: any, index: number = 0): React.ReactNode {
 
 export default function MainPage({ storyChapters }: MainPageProps) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const soundText = isPlaying ? "Silence the void" : "Tune into the void";
+  const soundText = isPlaying ? "Silence" : "Tune in";
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const touchStartXRef = useRef<number | null>(null);
@@ -452,7 +452,7 @@ export default function MainPage({ storyChapters }: MainPageProps) {
             className={`sound-toggle ${isPlaying ? "active" : ""}`}
             id="sound-toggle"
             onClick={handleSoundToggle}
-            aria-label={isPlaying ? "Silence ambient audio" : "Tune into ambient audio"}
+            aria-label={isPlaying ? "Silence ambient audio" : "Tune in to ambient audio"}
           >
             <span className="sound-icon" />
             <span className="sound-text">{soundText}</span>
