@@ -149,6 +149,10 @@ export interface User {
 export interface Story {
   id: number;
   title: string;
+  /**
+   * Unique URL slug for this story (e.g. 'chapter-i-the-river-styx')
+   */
+  slug: string;
   content: {
     root: {
       type: string;
@@ -271,6 +275,7 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface StoriesSelect<T extends boolean = true> {
   title?: T;
+  slug?: T;
   content?: T;
   publishedDate?: T;
   status?: T;

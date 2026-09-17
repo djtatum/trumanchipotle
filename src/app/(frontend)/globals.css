@@ -173,6 +173,17 @@ main {
     animation-delay: 0.3s;
 }
 
+.title-link {
+    color: inherit;
+    text-decoration: none;
+    transition: opacity 0.3s ease, text-shadow 0.3s ease;
+}
+
+.title-link:hover {
+    opacity: 0.92;
+    text-shadow: 0 0 25px rgba(229, 143, 143, 0.25);
+}
+
 .tagline {
     font-size: 0.85rem;
     font-weight: 300;
@@ -491,6 +502,17 @@ main {
     line-height: 1.3;
 }
 
+.chapter-title-link {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.25s ease, text-shadow 0.25s ease;
+}
+
+.chapter-title-link:hover {
+    color: #fca5a5;
+    text-shadow: 0 0 14px rgba(229, 143, 143, 0.4);
+}
+
 .chapter-content {
     font-family: var(--font-courier-prime), monospace;
     font-size: 0.85rem;
@@ -530,15 +552,73 @@ main {
     white-space: pre-wrap;
 }
 
+.chapter-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px dashed rgba(143, 162, 166, 0.12);
+    gap: 0.8rem;
+}
+
 .chapter-date {
     font-family: var(--font-courier-prime), monospace;
     font-size: 0.68rem;
     color: #6b7577;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    margin-top: auto;
-    padding-top: 1rem;
-    border-top: 1px dashed rgba(143, 162, 166, 0.12);
+}
+
+.chapter-actions {
+    display: flex;
+    align-items: center;
+}
+
+.chapter-link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: rgba(12, 14, 15, 0.6);
+    border: 1px solid rgba(143, 162, 166, 0.18);
+    border-radius: 3px;
+    padding: 0.25rem 0.55rem;
+    color: #8fa2a6;
+    font-family: var(--font-courier-prime), monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.chapter-link-btn:hover {
+    color: #e58f8f;
+    border-color: rgba(229, 143, 143, 0.5);
+    background: rgba(229, 143, 143, 0.08);
+    box-shadow: 0 0 10px rgba(229, 143, 143, 0.2);
+    transform: translateY(-1px);
+}
+
+.chapter-link-btn.copied {
+    color: #9fe0a2;
+    border-color: rgba(159, 224, 162, 0.6);
+    background: rgba(159, 224, 162, 0.12);
+    box-shadow: 0 0 12px rgba(159, 224, 162, 0.3);
+}
+
+.link-btn-icon {
+    width: 11px;
+    height: 11px;
+    stroke: currentColor;
+    flex-shrink: 0;
+}
+
+.link-btn-text {
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    font-weight: 600;
 }
 
 .no-story {

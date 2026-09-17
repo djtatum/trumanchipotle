@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
 import AmbientCanvas from "./AmbientCanvas";
 
 interface StoryChapter {
   id: string | number;
   title: string;
+  slug?: string;
   content: any;
   publishedDate: string;
   status: string;
@@ -13,6 +15,7 @@ interface StoryChapter {
 
 interface MainPageProps {
   storyChapters: StoryChapter[];
+  initialSlug?: string;
 }
 
 function serializeLexical(node: any, index: number = 0): React.ReactNode {
@@ -201,11 +204,111 @@ function serializeLexical(node: any, index: number = 0): React.ReactNode {
   }
 }
 
-export default function MainPage({ storyChapters }: MainPageProps) {
+export default function MainPage({ storyChapters, initialSlug }: MainPageProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const soundText = isPlaying ? "Silence" : "Tune in";
 
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const maxIndex = Math.max(0, storyChapters.length - 1);
+
+  const getInitialIndex = useCallback(() => {
+    if (!initialSlug) return 0;
+    const normalized = decodeURIComponent(initialSlug).toLowerCase().trim();
+    const foundIdx = storyChapters.findIndex(
+      (c) =>
+        c.slug?.toLowerCase() === normalized ||
+        String(c.id) === normalized ||
+        c.slug?.toLowerCase().endsWith(`-${normalized}`)
+    );
+    return foundIdx !== -1 ? foundIdx : 0;
+  }, [initialSlug, storyChapters]);
+
+  const [currentIndex, setCurrentIndex] = useState(getInitialIndex);
+  const [copiedId, setCopiedId] = useState<string | number | null>(null);
+
+  const safeCurrentIndex = Math.min(currentIndex, maxIndex);
+
+  const navigateToStory = useCallback(
+    (index: number, replace: boolean = false) => {
+      const boundedIndex = Math.max(0, Math.min(index, maxIndex));
+      setCurrentIndex(boundedIndex);
+
+      const targetStory = storyChapters[boundedIndex];
+      if (targetStory?.slug && typeof window !== "undefined") {
+        const newUrl = `/stories/${targetStory.slug}`;
+        if (window.location.pathname !== newUrl) {
+          if (replace) {
+            window.history.replaceState({ index: boundedIndex, slug: targetStory.slug }, "", newUrl);
+          } else {
+            window.history.pushState({ index: boundedIndex, slug: targetStory.slug }, "", newUrl);
+          }
+        }
+      }
+    },
+    [maxIndex, storyChapters]
+  );
+
+  const handlePrev = useCallback(() => {
+    navigateToStory(Math.max(0, Math.min(currentIndex, maxIndex) - 1));
+  }, [currentIndex, maxIndex, navigateToStory]);
+
+  const handleNext = useCallback(() => {
+    navigateToStory(Math.min(maxIndex, Math.min(currentIndex, maxIndex) + 1));
+  }, [currentIndex, maxIndex, navigateToStory]);
+
+  const handleCardClick = (index: number) => {
+    if (index !== safeCurrentIndex) {
+      navigateToStory(index);
+    }
+  };
+
+  const handleCopyLink = async (slug: string, id: string | number) => {
+    if (typeof window === "undefined") return;
+    const url = `${window.location.origin}/stories/${slug}`;
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = url;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+      setCopiedId(id);
+      setTimeout(() => {
+        setCopiedId(null);
+      }, 2000);
+    } catch {
+      prompt("Story link:", url);
+    }
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const pathname = window.location.pathname;
+      const match = pathname.match(/^\/stories\/([^/]+)/);
+      if (match) {
+        const pathSlug = decodeURIComponent(match[1]).toLowerCase().trim();
+        const idx = storyChapters.findIndex(
+          (c) =>
+            c.slug?.toLowerCase() === pathSlug ||
+            String(c.id) === pathSlug ||
+            c.slug?.toLowerCase().endsWith(`-${pathSlug}`)
+        );
+        if (idx !== -1) {
+          setCurrentIndex(idx);
+          return;
+        }
+      } else if (pathname === "/") {
+        setCurrentIndex(0);
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [storyChapters]);
+
   const touchStartXRef = useRef<number | null>(null);
 
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -220,17 +323,6 @@ export default function MainPage({ storyChapters }: MainPageProps) {
   useEffect(() => {
     isPlayingRef.current = isPlaying;
   }, [isPlaying]);
-
-  const maxIndex = Math.max(0, storyChapters.length - 1);
-  const safeCurrentIndex = Math.min(currentIndex, maxIndex);
-
-  const handlePrev = useCallback(() => {
-    setCurrentIndex((prev) => Math.max(0, Math.min(prev, maxIndex) - 1));
-  }, [maxIndex]);
-
-  const handleNext = useCallback(() => {
-    setCurrentIndex((prev) => Math.min(maxIndex, Math.min(prev, maxIndex) + 1));
-  }, [maxIndex]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -259,12 +351,6 @@ export default function MainPage({ storyChapters }: MainPageProps) {
       } else {
         handlePrev();
       }
-    }
-  };
-
-  const handleCardClick = (index: number) => {
-    if (index !== safeCurrentIndex) {
-      setCurrentIndex(index);
     }
   };
 
@@ -460,7 +546,11 @@ export default function MainPage({ storyChapters }: MainPageProps) {
         </header>
 
         <main className="story-container">
-          <h1 className="title">Truman Chipotle</h1>
+          <h1 className="title">
+            <Link href="/" className="title-link">
+              Truman Chipotle
+            </Link>
+          </h1>
 
           {storyChapters.length > 0 ? (
             <div className="slideshow-container">
@@ -476,7 +566,7 @@ export default function MainPage({ storyChapters }: MainPageProps) {
                           key={idx}
                           type="button"
                           className={`slideshow-dot ${idx === safeCurrentIndex ? "active" : ""}`}
-                          onClick={() => setCurrentIndex(idx)}
+                          onClick={() => navigateToStory(idx)}
                           aria-label={`Slide ${idx + 1}`}
                           role="tab"
                           aria-selected={idx === safeCurrentIndex}
@@ -555,19 +645,67 @@ export default function MainPage({ storyChapters }: MainPageProps) {
                             <span className="focus-hint-badge">[ FOCUS ]</span>
                           </div>
                         )}
-                        {chapter.title && <h2 className="chapter-title">{chapter.title}</h2>}
+                        {chapter.title && (
+                          <h2 className="chapter-title">
+                            <Link
+                              href={`/stories/${chapter.slug || chapter.id}`}
+                              className="chapter-title-link"
+                              onClick={(e) => {
+                                if (!inFocus) {
+                                  e.preventDefault();
+                                  navigateToStory(index);
+                                }
+                              }}
+                            >
+                              {chapter.title}
+                            </Link>
+                          </h2>
+                        )}
                         <div className="chapter-content">
                           {serializeLexical(chapter.content?.root)}
                         </div>
-                        {chapter.publishedDate && (
-                          <time className="chapter-date">
-                            {new Date(chapter.publishedDate).toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                            })}
-                          </time>
-                        )}
+                        <div className="chapter-footer">
+                          {chapter.publishedDate && (
+                            <time className="chapter-date">
+                              {new Date(chapter.publishedDate).toLocaleDateString("en-US", {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              })}
+                            </time>
+                          )}
+                          {chapter.slug && (
+                            <div className="chapter-actions">
+                              <button
+                                type="button"
+                                className={`chapter-link-btn ${copiedId === chapter.id ? "copied" : ""}`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCopyLink(chapter.slug!, chapter.id);
+                                }}
+                                title={`Direct link: /stories/${chapter.slug}`}
+                                aria-label={`Copy link to ${chapter.title}`}
+                              >
+                                <svg
+                                  className="link-btn-icon"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  aria-hidden="true"
+                                >
+                                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                                </svg>
+                                <span className="link-btn-text">
+                                  {copiedId === chapter.id ? "COPIED" : "LINK"}
+                                </span>
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </article>
                     );
                   })}
