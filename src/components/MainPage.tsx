@@ -1,8 +1,11 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import Link from "next/link";
 import AmbientCanvas from "./AmbientCanvas";
+
+function isModifiedEvent(e: React.MouseEvent) {
+  return !!(e.metaKey || e.altKey || e.ctrlKey || e.shiftKey || e.button !== 0);
+}
 
 interface StoryChapter {
   id: string | number;
@@ -256,10 +259,17 @@ export default function MainPage({ storyChapters, initialSlug }: MainPageProps) 
 
   const isPopStateRef = useRef(false);
   const isInitialMountRef = useRef(true);
+  const isDirectHomeNavRef = useRef(false);
 
   // Synchronize URL and document title whenever the user moves between stories
   useEffect(() => {
     if (typeof window === "undefined" || storyChapters.length === 0) return;
+
+    if (isDirectHomeNavRef.current) {
+      isDirectHomeNavRef.current = false;
+      document.title = "Truman Chipotle";
+      return;
+    }
 
     const targetStory = storyChapters[safeCurrentIndex];
     if (!targetStory) return;
@@ -337,6 +347,34 @@ export default function MainPage({ storyChapters, initialSlug }: MainPageProps) 
     }
   };
 
+  const handleTitleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (isModifiedEvent(e)) return;
+    e.preventDefault();
+    if (safeCurrentIndex !== 0) {
+      isDirectHomeNavRef.current = true;
+      navigateToStory(0);
+    }
+    if (typeof window !== "undefined" && window.location.pathname !== "/") {
+      window.history.pushState({ index: 0, slug: "" }, "", "/");
+      document.title = "Truman Chipotle";
+    }
+  };
+
+  const handleChapterTitleClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    chapter: StoryChapter,
+    index: number,
+    inFocus: boolean
+  ) => {
+    if (isModifiedEvent(e)) return;
+    e.preventDefault();
+    if (!inFocus) {
+      navigateToStory(index);
+    } else {
+      handleCopyLink(getStorySlug(chapter), chapter.id);
+    }
+  };
+
   useEffect(() => {
     const handlePopState = () => {
       const pathname = window.location.pathname;
@@ -359,6 +397,7 @@ export default function MainPage({ storyChapters, initialSlug }: MainPageProps) 
         }
       } else if (pathname === "/") {
         isPopStateRef.current = true;
+        document.title = "Truman Chipotle";
         setCurrentIndex(0);
       }
     };
@@ -605,9 +644,14 @@ export default function MainPage({ storyChapters, initialSlug }: MainPageProps) 
 
         <main className="story-container">
           <h1 className="title">
-            <Link href="/" className="title-link">
+            <a
+              href="/"
+              className="title-link"
+              onClick={handleTitleClick}
+              title="Truman Chipotle — Return to beginning"
+            >
               Truman Chipotle
-            </Link>
+            </a>
           </h1>
 
           {storyChapters.length > 0 ? (
@@ -705,18 +749,20 @@ export default function MainPage({ storyChapters, initialSlug }: MainPageProps) 
                         )}
                         {chapter.title && (
                           <h2 className="chapter-title">
-                            <Link
+                            <a
                               href={`/stories/${getStorySlug(chapter)}`}
                               className="chapter-title-link"
-                              onClick={(e) => {
-                                if (!inFocus) {
-                                  e.preventDefault();
-                                  navigateToStory(index);
-                                }
-                              }}
+                              onClick={(e) =>
+                                handleChapterTitleClick(e, chapter, index, inFocus)
+                              }
+                              title={
+                                inFocus
+                                  ? "Click to copy story link"
+                                  : "Click to bring chapter into focus"
+                              }
                             >
                               {chapter.title}
-                            </Link>
+                            </a>
                           </h2>
                         )}
                         <div className="chapter-content">
