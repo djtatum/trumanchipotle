@@ -7,12 +7,32 @@ import { fileURLToPath } from "url";
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
-export const formatSlug = (val: string): string =>
-  val
+export const extractShortName = (title: string): string => {
+  if (!title) return "";
+  if (title.includes(":")) {
+    const afterColon = title.split(":").slice(1).join(":").trim();
+    if (afterColon) return afterColon;
+  }
+  if (title.includes(" - ")) {
+    const afterDash = title.split(" - ").slice(1).join(" - ").trim();
+    if (afterDash) return afterDash;
+  }
+  const chapterPrefixRegex = /^(?:chapter|part|transmission|act)\s+[0-9ivxlcdm]+\s*[:\-–—]?\s*/i;
+  const stripped = title.replace(chapterPrefixRegex, "").trim();
+  return stripped || title;
+};
+
+export const slugify = (text: string): string =>
+  text
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+
+export const formatSlug = (val: string): string => {
+  const shortName = extractShortName(val);
+  return slugify(shortName);
+};
 
 export default buildConfig({
   admin: {
@@ -53,13 +73,13 @@ export default buildConfig({
           index: true,
           admin: {
             position: "sidebar",
-            description: "Unique URL slug for this story (e.g. 'chapter-i-the-river-styx')",
+            description: "Short name URL slug for this story (e.g. 'the-river-styx')",
           },
           hooks: {
             beforeValidate: [
               ({ value, data }) => {
                 if (typeof value === "string" && value.trim()) {
-                  return formatSlug(value);
+                  return slugify(value);
                 }
                 if (data?.title && typeof data.title === "string") {
                   return formatSlug(data.title);

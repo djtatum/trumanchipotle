@@ -32,12 +32,15 @@ function extractExcerpt(content: unknown): string {
 
 function findMatchingStory(stories: Story[], slug: string): Story | undefined {
   const normalized = decodeURIComponent(slug).toLowerCase().trim();
-  return stories.find(
-    (s) =>
-      s.slug?.toLowerCase() === normalized ||
+  return stories.find((s) => {
+    const sSlug = s.slug?.toLowerCase();
+    return (
+      sSlug === normalized ||
       String(s.id) === normalized ||
-      s.slug?.toLowerCase().endsWith(`-${normalized}`)
-  );
+      (sSlug ? sSlug.endsWith(`-${normalized}`) : false) ||
+      (sSlug ? normalized.endsWith(`-${sSlug}`) : false)
+    );
+  });
 }
 
 export async function generateMetadata({

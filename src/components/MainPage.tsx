@@ -18,6 +18,30 @@ interface MainPageProps {
   initialSlug?: string;
 }
 
+function extractShortNameSlug(title: string): string {
+  if (!title) return "";
+  let text = title;
+  if (text.includes(":")) {
+    const after = text.split(":").slice(1).join(":").trim();
+    if (after) text = after;
+  } else if (text.includes(" - ")) {
+    const after = text.split(" - ").slice(1).join(" - ").trim();
+    if (after) text = after;
+  } else {
+    text = text.replace(/^(?:chapter|part|transmission|act)\s+[0-9ivxlcdm]+\s*[:\-–—]?\s*/i, "").trim() || text;
+  }
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function getStorySlug(chapter: StoryChapter): string {
+  if (chapter.slug && chapter.slug.trim()) return chapter.slug.trim();
+  return extractShortNameSlug(chapter.title);
+}
+
 function serializeLexical(node: any, index: number = 0): React.ReactNode {
   if (!node) return null;
 
@@ -213,12 +237,15 @@ export default function MainPage({ storyChapters, initialSlug }: MainPageProps) 
   const getInitialIndex = useCallback(() => {
     if (!initialSlug) return 0;
     const normalized = decodeURIComponent(initialSlug).toLowerCase().trim();
-    const foundIdx = storyChapters.findIndex(
-      (c) =>
-        c.slug?.toLowerCase() === normalized ||
+    const foundIdx = storyChapters.findIndex((c) => {
+      const slug = getStorySlug(c)?.toLowerCase();
+      return (
+        slug === normalized ||
         String(c.id) === normalized ||
-        c.slug?.toLowerCase().endsWith(`-${normalized}`)
-    );
+        (slug ? slug.endsWith(`-${normalized}`) : false) ||
+        (slug ? normalized.endsWith(`-${slug}`) : false)
+      );
+    });
     return foundIdx !== -1 ? foundIdx : 0;
   }, [initialSlug, storyChapters]);
 
@@ -227,33 +254,59 @@ export default function MainPage({ storyChapters, initialSlug }: MainPageProps) 
 
   const safeCurrentIndex = Math.min(currentIndex, maxIndex);
 
+  const isPopStateRef = useRef(false);
+  const isInitialMountRef = useRef(true);
+
+  // Synchronize URL and document title whenever the user moves between stories
+  useEffect(() => {
+    if (typeof window === "undefined" || storyChapters.length === 0) return;
+
+    const targetStory = storyChapters[safeCurrentIndex];
+    if (!targetStory) return;
+
+    const slug = getStorySlug(targetStory);
+    const newUrl = slug ? `/stories/${slug}` : "/";
+
+    if (targetStory.title) {
+      document.title = `${targetStory.title} | Truman Chipotle`;
+    }
+
+    // On initial mount, don't overwrite '/' if the user landed on the root page
+    if (isInitialMountRef.current) {
+      isInitialMountRef.current = false;
+      return;
+    }
+
+    // If change came from browser popstate (back/forward), don't push again
+    if (isPopStateRef.current) {
+      isPopStateRef.current = false;
+      return;
+    }
+
+    if (window.location.pathname !== newUrl) {
+      window.history.pushState(
+        { index: safeCurrentIndex, slug },
+        "",
+        newUrl
+      );
+    }
+  }, [safeCurrentIndex, storyChapters]);
+
   const navigateToStory = useCallback(
-    (index: number, replace: boolean = false) => {
+    (index: number) => {
       const boundedIndex = Math.max(0, Math.min(index, maxIndex));
       setCurrentIndex(boundedIndex);
-
-      const targetStory = storyChapters[boundedIndex];
-      if (targetStory?.slug && typeof window !== "undefined") {
-        const newUrl = `/stories/${targetStory.slug}`;
-        if (window.location.pathname !== newUrl) {
-          if (replace) {
-            window.history.replaceState({ index: boundedIndex, slug: targetStory.slug }, "", newUrl);
-          } else {
-            window.history.pushState({ index: boundedIndex, slug: targetStory.slug }, "", newUrl);
-          }
-        }
-      }
     },
-    [maxIndex, storyChapters]
+    [maxIndex]
   );
 
   const handlePrev = useCallback(() => {
-    navigateToStory(Math.max(0, Math.min(currentIndex, maxIndex) - 1));
-  }, [currentIndex, maxIndex, navigateToStory]);
+    navigateToStory(safeCurrentIndex - 1);
+  }, [safeCurrentIndex, navigateToStory]);
 
   const handleNext = useCallback(() => {
-    navigateToStory(Math.min(maxIndex, Math.min(currentIndex, maxIndex) + 1));
-  }, [currentIndex, maxIndex, navigateToStory]);
+    navigateToStory(safeCurrentIndex + 1);
+  }, [safeCurrentIndex, navigateToStory]);
 
   const handleCardClick = (index: number) => {
     if (index !== safeCurrentIndex) {
@@ -290,17 +343,22 @@ export default function MainPage({ storyChapters, initialSlug }: MainPageProps) 
       const match = pathname.match(/^\/stories\/([^/]+)/);
       if (match) {
         const pathSlug = decodeURIComponent(match[1]).toLowerCase().trim();
-        const idx = storyChapters.findIndex(
-          (c) =>
-            c.slug?.toLowerCase() === pathSlug ||
+        const idx = storyChapters.findIndex((c) => {
+          const slug = getStorySlug(c)?.toLowerCase();
+          return (
+            slug === pathSlug ||
             String(c.id) === pathSlug ||
-            c.slug?.toLowerCase().endsWith(`-${pathSlug}`)
-        );
+            (slug ? slug.endsWith(`-${pathSlug}`) : false) ||
+            (slug ? pathSlug.endsWith(`-${slug}`) : false)
+          );
+        });
         if (idx !== -1) {
+          isPopStateRef.current = true;
           setCurrentIndex(idx);
           return;
         }
       } else if (pathname === "/") {
+        isPopStateRef.current = true;
         setCurrentIndex(0);
       }
     };
@@ -648,7 +706,7 @@ export default function MainPage({ storyChapters, initialSlug }: MainPageProps) 
                         {chapter.title && (
                           <h2 className="chapter-title">
                             <Link
-                              href={`/stories/${chapter.slug || chapter.id}`}
+                              href={`/stories/${getStorySlug(chapter)}`}
                               className="chapter-title-link"
                               onClick={(e) => {
                                 if (!inFocus) {
@@ -674,37 +732,35 @@ export default function MainPage({ storyChapters, initialSlug }: MainPageProps) 
                               })}
                             </time>
                           )}
-                          {chapter.slug && (
-                            <div className="chapter-actions">
-                              <button
-                                type="button"
-                                className={`chapter-link-btn ${copiedId === chapter.id ? "copied" : ""}`}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleCopyLink(chapter.slug!, chapter.id);
-                                }}
-                                title={`Direct link: /stories/${chapter.slug}`}
-                                aria-label={`Copy link to ${chapter.title}`}
+                          <div className="chapter-actions">
+                            <button
+                              type="button"
+                              className={`chapter-link-btn ${copiedId === chapter.id ? "copied" : ""}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCopyLink(getStorySlug(chapter), chapter.id);
+                              }}
+                              title={`Direct link: /stories/${getStorySlug(chapter)}`}
+                              aria-label={`Copy link to ${chapter.title}`}
+                            >
+                              <svg
+                                className="link-btn-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                aria-hidden="true"
                               >
-                                <svg
-                                  className="link-btn-icon"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  aria-hidden="true"
-                                >
-                                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                                </svg>
-                                <span className="link-btn-text">
-                                  {copiedId === chapter.id ? "COPIED" : "LINK"}
-                                </span>
-                              </button>
-                            </div>
-                          )}
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                              </svg>
+                              <span className="link-btn-text">
+                                {copiedId === chapter.id ? "COPIED" : "LINK"}
+                              </span>
+                            </button>
+                          </div>
                         </div>
                       </article>
                     );
